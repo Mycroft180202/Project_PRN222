@@ -28,6 +28,8 @@ namespace Project_PRN222.Services.Implementations
 
         public void UpdateCategory(Category category)
         {
+            //Xu li logic thang nao duoc phep update
+            //Check roleID 
             _categoryRepository.Update(category);
         }
 

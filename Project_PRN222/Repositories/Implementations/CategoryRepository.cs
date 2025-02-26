@@ -10,13 +10,12 @@ namespace Project_PRN222.Repositories.Implementations
         {
             _context = context;
         }
-        void ICategoryRepository.Add(Category category)
+        public void Add(Category category)
         {
             _context.Categories.Add(category);
             _context.SaveChanges();
         }
-
-        void ICategoryRepository.Delete(int id)
+        public void Delete(int id)
         {
             var category = _context.Categories.Find(id);
             if(category != null)
@@ -26,17 +25,17 @@ namespace Project_PRN222.Repositories.Implementations
             }
         }
 
-        IEnumerable<Category> ICategoryRepository.GetAll()
+        public IEnumerable<Category> GetAll()
         {
             return _context.Categories.ToList();
         }
 
-        Category ICategoryRepository.GetById(int id)
+        public Category GetById(int id)
         {
             return _context.Categories.Find(id);
         }
 
-        void ICategoryRepository.Update(Category category)
+        public void Update(Category category)
         {
             _context.Categories.Update(category);
             _context.SaveChanges();

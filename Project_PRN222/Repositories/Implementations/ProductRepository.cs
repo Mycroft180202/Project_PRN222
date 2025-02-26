@@ -11,13 +11,13 @@ namespace Project_PRN222.Repositories.Implementations
             _context = context;
         }
 
-        void IProductRepository.Add(Product product)
+        public void Add(Product product)
         {
             _context.Products.Add(product);
             _context.SaveChanges();
         }
 
-        void IProductRepository.Delete(int id)
+        public void Delete(int id)
         {
             var product = _context.Products.Find(id);
             if (product != null)
@@ -26,18 +26,17 @@ namespace Project_PRN222.Repositories.Implementations
                 _context.SaveChanges();
             }
         }
-
-        IEnumerable<Product> IProductRepository.GetAll()
+        public IEnumerable<Product> GetAll()
         {
             return _context.Products.ToList();
         }
 
-        Product IProductRepository.GetById(int id)
+        public Product GetById(int id)
         {
             return _context.Products.Find(id);
         }
 
-        void IProductRepository.Update(Product product)
+        public void Update(Product product)
         {
             _context.Products.Update(product);
             _context.SaveChanges();
