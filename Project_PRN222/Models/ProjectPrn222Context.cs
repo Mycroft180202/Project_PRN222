@@ -34,6 +34,7 @@ public partial class ProjectPrn222Context : DbContext
     public virtual DbSet<ShipmentMethod> ShipmentMethods { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
+    public DbSet<Vendor> Vendors { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
