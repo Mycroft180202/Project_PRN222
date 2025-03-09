@@ -1,0 +1,77 @@
+﻿@page
+@model Project_PRN222.Pages.orders.IndexModel
+@{
+    ViewData["Title"] = "Orders List";
+}
+
+<!-- Font Awesome -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+<!-- Customized Bootstrap Stylesheet -->
+<link href="css/style.css" rel="stylesheet">
+
+<!-- Page Header Start -->
+<div class="container-fluid bg-secondary mb-5">
+    <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+        <h1 class="font-weight-semi-bold text-uppercase mb-3">Your Orders</h1>
+        <div class="d-inline-flex">
+            <p class="m-0"><a href="">Home</a></p>
+            <p class="m-0 px-2">-</p>
+            <p class="m-0">Orders</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+<!-- Orders Table Start -->
+<div class="container-fluid pt-5">
+    <div class="row px-xl-5">
+        <div class="col-lg-10 mx-auto table-responsive">
+            <table class="table table-bordered text-center">
+                <thead class="bg-secondary text-dark">
+                    <tr>
+                        <th>Product</th>
+                        <th>Date</th>
+                        <th>Address</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                        <th>Shipment Method</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model.Orders)
+                    {
+                        var firstProduct = order.OrderItems?.FirstOrDefault()?.Product?.ProductName ?? "No Products";
+                        var productImg = order.OrderItems?.FirstOrDefault()?.Product?.ImageUrl ?? "";
+
+                        <tr class="order-@order.OrderId">
+                            <td class="align-middle"><img src="@productImg" alt="" style="width: 50px;"> @firstProduct</td>
+                            <td class="align-middle">@order.CreatedDate</td>
+                            <td class="align-middle">@order.ShippingAddress</td>
+                            <td class="align-middle"><span class="badge badge-@(order.OrderStatus.Equals("Completed", StringComparison.OrdinalIgnoreCase) ? "success" : (order.OrderStatus.Equals("Cancelled", StringComparison.OrdinalIgnoreCase) ? "danger" : "warning"))">@order.OrderStatus</span></td>
+                            <td class="align-middle">@order.TotalAmount.ToString("N0") đ</td>
+                            <td class="align-middle">@order.ShipmentMethod.MethodName</td>
+                            <td class="align-middle"><a href="order?oid=@order.OrderId" class="detail btn btn-sm btn-primary">View Details</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- Orders Table End -->
+
+<!-- Order Details Modal -->
+<div id="orderDetailsModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Order Details</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <iframe id="orderDetailsFrame" style="width:100%; height:500px; border:none;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
