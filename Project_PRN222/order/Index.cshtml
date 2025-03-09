@@ -1,0 +1,122 @@
+﻿@page
+@model Project_PRN222.Pages.order.IndexModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Order";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Project_PRN222</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Project_PRN222.styles.css" asp-append-version="true" />
+    <meta content="Free HTML Templates" name="keywords">
+    <meta content="Free HTML Templates" name="description">
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Order Header -->
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>Order #@Model.Order.OrderId</h2>
+            <span class="badge @(Model.Order.Delivery.DeliveryStatus == "Delivered" ? "badge-success" :
+                            Model.Order.Delivery.DeliveryStatus == "Shipped" ? "badge-warning" :
+                            Model.Order.Delivery.DeliveryStatus == "Cancelled" ? "badge-danger" :
+                            "badge-secondary")">
+                @Model.Order.Delivery.DeliveryStatus
+            </span>
+        </div>
+        <p>Order Date: @Model.Order.OrderDate?.ToString("yyyy-MM-dd")</p>
+    </div>
+
+    <!-- Order Items Table -->
+    <div class="container mt-3">
+        <table class="table table-bordered text-center">
+            <thead class="bg-secondary text-dark">
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Order.OrderItems)
+                {
+                    var subtotal = item.Quantity * item.Price;
+                    <tr>
+                        <td>@item.Product?.ProductName</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.Price.ToString("N2") đ</td>
+                        <td>@subtotal.ToString("N2") đ</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <table class="table table-bordered text-center">
+            <thead class="bg-secondary text-dark">
+                <tr>
+                    <th>Shipment Method</th>
+                    <th>Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@Model.Order.ShipmentMethod?.MethodName</td>
+                    <td>@Model.Order.ShipmentMethod?.Cost.ToString("N2") đ</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Order Total and Cancel Button -->
+    <div class="container mt-4">
+        <h4 class="text-right">Total: $@Model.Order.TotalAmount.ToString("N2")</h4>
+
+        @if (!Model.Order.OrderStatus.Equals("Completed", StringComparison.OrdinalIgnoreCase) && !Model.Order.OrderStatus.Equals("Cancelled", StringComparison.OrdinalIgnoreCase))
+        {
+            <form method="post">
+                <input type="hidden" name="orderId" value="@Model.Order.OrderId" />
+                <button type="submit" class="cancel-order btn btn-danger">Cancel Order</button>
+            </form>
+        }
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!-- JavaScript Libraries -->
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+
+    <!-- Contact Javascript File -->
+    <script src="mail/jqBootstrapValidation.min.js"></script>
+    <script src="mail/contact.js"></script>
+
+    <!-- Template Javascript -->
+    <script src="js/main.js"></script>
+
+
+</body>
+</html>
