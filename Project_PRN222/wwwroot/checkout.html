@@ -105,7 +105,6 @@
                 </form>
             </div>
             <div class="col-lg-3 col-6 text-right">
-                
                 <a href="" class="btn border">
                     <i class="fas fa-shopping-cart text-primary"></i>
                     <span class="badge">0</span>
@@ -214,17 +213,42 @@
                             <h5 class="font-weight-medium m-0">Ordered Products</h5>
                         </div>
                         <div class="card-body">
-                            <!-- Shipping address from user account -->
+                            <!-- Shipping Address -->
                             <div class="mb-3">
                                 <h6 class="font-weight-medium">Shipping Address</h6>
-                                <p>[BillingAddress]</p>
+                                <textarea class="form-control" name="shippingAddress" rows="3" placeholder="Enter your shipping address" required>[ShippingAddress]</textarea>
                             </div>
-                            <!-- Billing address from user account -->
+                            <!-- Billing Address -->
                             <div class="mb-3">
                                 <h6 class="font-weight-medium">Billing Address</h6>
-                                <p>[ShippingAddress]</p>
+                                <textarea class="form-control" name="billingAddress" rows="3" placeholder="Enter your billing address" required>[BillingAddress]</textarea>
                             </div>
-                            <!-- Loop through CartItems (assumed from previous request as Orders are post-purchase) -->
+                            <!-- Shipment Method -->
+                            <div class="mb-3">
+                                <h6 class="font-weight-medium">Shipment Method</h6>
+                                <select class="form-control" name="shipmentMethodId" required>
+                                    <option value="">Select a shipment method</option>
+                                    <option value="1">Standard Shipping (3-5 days) - 30,000 VND</option>
+                                    <option value="2">Express Shipping (1-2 days) - 50,000 VND</option>
+                                </select>
+                            </div>
+                            <!-- Payment Method -->
+                            <div class="mb-3">
+                                <h6 class="font-weight-medium">Payment Method</h6>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="COD" checked>
+                                    <label class="form-check-label" for="cod">
+                                        Cash on Delivery (COD)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="vnpay" value="VNPAY">
+                                    <label class="form-check-label" for="vnpay">
+                                        Checkout with VNPAY
+                                    </label>
+                                </div>
+                            </div>
+                            <!-- Cart Items -->
                             <div class="cart-item">
                                 <div class="d-flex justify-content-between">
                                     <p>[ProductName] (ID: [ProductId])</p>
@@ -266,6 +290,10 @@
                         </div>
                         <form action="place_order.php" method="post">
                             <input type="hidden" name="userId" value="[UserId]">
+                            <input type="hidden" name="shippingAddress" value="">
+                            <input type="hidden" name="billingAddress" value="">
+                            <input type="hidden" name="shipmentMethodId" value="">
+                            <input type="hidden" name="paymentMethod" value="">
                             <button type="submit" class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3">Place Order</button>
                         </form>
                     </div>
@@ -355,6 +383,19 @@
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
+
+    <!-- Custom Script to Sync Form Data -->
+    <script>
+        $(document).ready(function () {
+            $('form[action="place_order.php"]').on('submit', function () {
+                // Sync input values to hidden fields
+                $('input[name="shippingAddress"]').val($('textarea[name="shippingAddress"]').val());
+                $('input[name="billingAddress"]').val($('textarea[name="billingAddress"]').val());
+                $('input[name="shipmentMethodId"]').val($('select[name="shipmentMethodId"]').val());
+                $('input[name="paymentMethod"]').val($('input[name="paymentMethod"]:checked').val());
+            });
+        });
+    </script>
 </body>
 
 </html>
