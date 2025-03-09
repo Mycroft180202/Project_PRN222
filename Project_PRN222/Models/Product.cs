@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Project_PRN222.Models;
 
@@ -25,6 +26,7 @@ public partial class Product
 
     public DateTime? UpdatedDate { get; set; }
 
+    [JsonIgnore]
     public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 
     public virtual Category? Category { get; set; }
