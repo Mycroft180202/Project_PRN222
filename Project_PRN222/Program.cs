@@ -4,9 +4,9 @@ using Project_PRN222.Repositories.Implementations;
 using Project_PRN222.Repositories.Interfaces;
 using Project_PRN222.Services.Implementations;
 using Project_PRN222.Services.Interfaces;
+using Project_PRN222.Services; // Thêm namespace cho VnpayPayment
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -22,18 +22,28 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+// Register repositories
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IVendorRepository, VendorRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();       // Thêm cho Order
+builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>(); // Thêm cho OrderItem
+builder.Services.AddScoped<IDeliveryRepository, DeliveryRepository>();   // Thêm cho Delivery
+
+// Register services
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddScoped<IVendorRepository, VendorRepository>();
 builder.Services.AddScoped<IVendorService, VendorService>();
+builder.Services.AddScoped<IOrderService, OrderService>();       // Thêm cho OrderService
+builder.Services.AddScoped<VnpayPayment>();                      // Thêm cho VNPAY
+
+// Add HttpContextAccessor for session and IP address retrieval
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
@@ -56,7 +66,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseSession(); 
+app.UseSession();
 app.UseAuthorization();
 
 app.MapControllerRoute(
