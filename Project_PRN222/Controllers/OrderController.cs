@@ -7,7 +7,7 @@ namespace Project_PRN222.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class OrderController : ControllerBase
+    public class OrderController : Controller
     {
         private readonly IOrderService _orderService;
 
@@ -15,6 +15,15 @@ namespace Project_PRN222.Controllers
         {
             _orderService = orderService;
         }
+
+        // Action to return Checkout View
+        [HttpGet("checkout")]
+        [RoleAuthorize(1, 2, 3)]
+        public IActionResult Checkout()
+        {
+            return View("Checkout"); // Assuming you have a Checkout.cshtml in Views/Order
+        }
+
 
         [HttpPost("checkout")]
         [RoleAuthorize(1, 2, 3)]
@@ -40,14 +49,14 @@ namespace Project_PRN222.Controllers
         }
 
         [HttpGet("callback")]
-        public async Task<IActionResult> Callback() // Changed return type to IActionResult
+        public async Task<IActionResult> Callback()
         {
             if (Request.QueryString.HasValue)
             {
                 try
                 {
-                    IActionResult result = await _orderService.ProcessVnpayCallback(Request.Query); // Get IActionResult directly
-                    return result; // Return the IActionResult directly
+                    IActionResult result = await _orderService.ProcessVnpayCallback(Request.Query);
+                    return result;
                 }
                 catch (Exception ex)
                 {
@@ -68,9 +77,9 @@ namespace Project_PRN222.Controllers
                     IActionResult result = await _orderService.ProcessVnpayCallback(Request.Query);
                     if (result is OkObjectResult)
                     {
-                        return Ok(); // For IPN, just return Ok on success
+                        return Ok();
                     }
-                    return BadRequest("Thanh toán thất bại"); // For IPN, return BadRequest on failure
+                    return BadRequest("Thanh toán thất bại");
                 }
                 catch (Exception ex)
                 {

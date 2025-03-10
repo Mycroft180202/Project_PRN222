@@ -39,6 +39,13 @@ namespace Project_PRN222.Controllers
             return Ok(category);
         }
 
+        [HttpGet("Create")]
+        [RoleAuthorize(1)]
+        public IActionResult Create()
+        {
+            return View("Create"); // Assuming you have a Create.cshtml in Views/Category for creating categories
+        }
+
         // Chỉ Admin được tạo danh mục
         [HttpPost("api/categories")]
         [RoleAuthorize(1)] 
@@ -50,6 +57,18 @@ namespace Project_PRN222.Controllers
             }
             _categoryService.CreateCategory(category);
             return CreatedAtAction(nameof(GetCategoryByIdApi), new { id = category.CategoryId }, category);
+        }
+
+        [HttpGet("Edit/{id}")]
+        [RoleAuthorize(1)]
+        public IActionResult Edit(int id)
+        {
+            var category = _categoryService.GetCategoryById(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            return View("Edit", category); // Assuming you have an Edit.cshtml in Views/Category for editing categories, passing the category model
         }
 
         // Chỉ Admin được sửa danh mục
@@ -72,6 +91,18 @@ namespace Project_PRN222.Controllers
             }
             _categoryService.UpdateCategory(category);
             return NoContent();
+        }
+
+        [HttpGet("Delete/{id}")]
+        [RoleAuthorize(1)]
+        public IActionResult Delete(int id)
+        {
+            var category = _categoryService.GetCategoryById(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            return View("DeleteConfirmation", category); // Assuming you have a DeleteConfirmation.cshtml in Views/Category
         }
 
         // Chỉ Admin được xóa danh mục

@@ -8,7 +8,7 @@ namespace Project_PRN222.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UserController : Controller
     {
         private readonly IUserService _userService;
         private readonly IVendorService _vendorService;
@@ -19,8 +19,28 @@ namespace Project_PRN222.Controllers
             _vendorService = vendorService;
         }
 
+        // Action to return User Profile View (for logged in user)
+        [HttpGet("Profile")]
+        [RoleAuthorize(1, 2, 3)]
+        public async Task<IActionResult> ProfileView()
+        {
+            var userId = int.Parse(HttpContext.Session.GetString("UserId") ?? "0");
+            if (userId == 0)
+            {
+                return Unauthorized("User not logged in.");
+            }
+
+            var user = await _userService.GetById(userId);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+            return View("Profile", user); // Assuming you have a Profile.cshtml in Views/User, passing the user model
+        }
+
+
         [HttpPut("me")]
-        [RoleAuthorize(1, 2, 3)] 
+        [RoleAuthorize(1, 2, 3)]
         public async Task<IActionResult> UpdateMyProfile([FromBody] UpdateUserDto updateDto)
         {
             var userId = int.Parse(HttpContext.Session.GetString("UserId") ?? "0");
@@ -59,9 +79,23 @@ namespace Project_PRN222.Controllers
             return NoContent();
         }
 
+        // Action to return Edit User Role View (Admin only)
+        [HttpGet("EditRoleView/{id}")]
+        [RoleAuthorize(1)]
+        public async Task<IActionResult> EditRoleView(int id)
+        {
+            var user = await _userService.GetById(id);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+            return View("EditRole", user); // Assuming you have an EditRole.cshtml in Views/User, passing the user model
+        }
+
+
         // Thay đổi IsActive của tài khoản
         [HttpPut("{id}/active")]
-        [RoleAuthorize(1)] 
+        [RoleAuthorize(1)]
         public async Task<IActionResult> UpdateUserActive(int id, [FromBody] bool isActive)
         {
             var user = await _userService.GetById(id);
@@ -77,7 +111,7 @@ namespace Project_PRN222.Controllers
 
         // Thay đổi RoleId của tài khoản và lưu vào Vendor nếu RoleId = 2
         [HttpPut("{id}/role")]
-        [RoleAuthorize(1)] 
+        [RoleAuthorize(1)]
         public async Task<IActionResult> UpdateUserRole(int id, [FromBody] int newRoleId)
         {
             if (newRoleId < 1 || newRoleId > 3)
@@ -98,7 +132,7 @@ namespace Project_PRN222.Controllers
             if (newRoleId == 2)
             {
                 var existingVendor = await _vendorService.GetByUserId(id);
-                if (existingVendor == null) 
+                if (existingVendor == null)
                 {
                     var vendor = new Vendor
                     {
@@ -117,6 +151,16 @@ namespace Project_PRN222.Controllers
             return NoContent();
         }
 
+        // Action to return User List View (Admin only)
+        [HttpGet("ListView")]
+        [RoleAuthorize(1)] // Chỉ Admin
+        public async Task<IActionResult> ListView()
+        {
+            var users = await _userService.GetAll();
+            return View("List", users); // Assuming you have a List.cshtml in Views/User to display list of users, passing users model
+        }
+
+
         // Xem thông tin tất cả người dùng (cho Admin)
         [HttpGet]
         [RoleAuthorize(1)] // Chỉ Admin
@@ -126,9 +170,22 @@ namespace Project_PRN222.Controllers
             return Ok(users);
         }
 
+        // Action to return User Details View (Admin only)
+        [HttpGet("DetailsView/{id}")]
+        [RoleAuthorize(1)]
+        public async Task<IActionResult> DetailsView(int id)
+        {
+            var user = await _userService.GetById(id);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+            return View("Details", user); // Assuming you have a Details.cshtml in Views/User, passing the user model
+        }
+
         // Xem thông tin một người dùng
         [HttpGet("{id}")]
-        [RoleAuthorize(1)] 
+        [RoleAuthorize(1)]
         public async Task<IActionResult> GetUserById(int id)
         {
             var user = await _userService.GetById(id);
@@ -138,6 +195,5 @@ namespace Project_PRN222.Controllers
             }
             return Ok(user);
         }
-
     }
 }

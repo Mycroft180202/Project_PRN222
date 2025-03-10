@@ -4,7 +4,7 @@ using Project_PRN222.Repositories.Implementations;
 using Project_PRN222.Repositories.Interfaces;
 using Project_PRN222.Services.Implementations;
 using Project_PRN222.Services.Interfaces;
-using Project_PRN222.Services; // Thêm namespace cho VnpayPayment
+using Project_PRN222.Services; 
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -6,13 +6,21 @@ namespace Project_PRN222.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CartController : ControllerBase
+    public class CartController : Controller
     {
         private readonly ICartService _cartService;
 
         public CartController(ICartService cartService)
         {
             _cartService = cartService;
+        }
+
+        [HttpGet("cart")]
+        [RoleAuthorize(1, 2, 3)]
+        public async Task<IActionResult> Cart()
+        {
+            var cartItems = await _cartService.GetCartItems();
+            return View("Cart", cartItems); // Assuming you have a Cart.cshtml view in Views/Cart, and passing cartItems to the view
         }
 
         [HttpPost("add")]
