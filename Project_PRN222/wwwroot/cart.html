@@ -23,6 +23,45 @@
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
+
+    <style>
+        .sort-button {
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            color: #000;
+            transition: color 0.3s ease;
+        }
+
+            .sort-button i {
+                font-size: 14px;
+                margin-left: 5px;
+            }
+
+            .sort-button:hover {
+                color: #007bff;
+            }
+
+            .sort-button.active i {
+                color: #007bff;
+            }
+
+            .sort-button .fa-sort {
+                transform: rotate(0deg);
+                transition: transform 0.3s ease;
+            }
+
+            .sort-button.asc .fa-sort {
+                transform: rotate(180deg);
+            }
+
+            .sort-button.desc .fa-sort {
+                transform: rotate(0deg);
+            }
+    </style>
 </head>
 
 <body>
@@ -186,9 +225,19 @@
                     <thead class="bg-secondary text-dark">
                         <tr>
                             <th>Products</th>
-                            <th>Price</th>
+                            <th>
+                                Price
+                                <button class="sort-button" data-sort="price">
+                                    <i class="fas fa-sort"></i>
+                                </button>
+                            </th>
                             <th>Quantity</th>
-                            <th>Total</th>
+                            <th>
+                                Total
+                                <button class="sort-button" data-sort="total">
+                                    <i class="fas fa-sort"></i>
+                                </button>
+                            </th>
                             <th>Remove</th>
                         </tr>
                     </thead>
