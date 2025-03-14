@@ -1,15 +1,17 @@
-using Microsoft.EntityFrameworkCore;
+ï»¿using Microsoft.EntityFrameworkCore;
 using Project_PRN222.Models;
 using Project_PRN222.Repositories.Implementations;
 using Project_PRN222.Repositories.Interfaces;
 using Project_PRN222.Services.Implementations;
 using Project_PRN222.Services.Interfaces;
-using Project_PRN222.Services; 
+using Project_PRN222.Services;
+using Project_PRN222.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddSignalR();
 builder.Services.AddDbContext<ProjectPrn222Context>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DB")));
 
@@ -28,9 +30,9 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IVendorRepository, VendorRepository>();
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();       // Thêm cho Order
-builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>(); // Thêm cho OrderItem
-builder.Services.AddScoped<IDeliveryRepository, DeliveryRepository>();   // Thêm cho Delivery
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();       // ThÃªm cho Order
+builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>(); // ThÃªm cho OrderItem
+builder.Services.AddScoped<IDeliveryRepository, DeliveryRepository>();   // ThÃªm cho Delivery
 
 // Register services
 builder.Services.AddScoped<IProductService, ProductService>();
@@ -40,8 +42,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IVendorService, VendorService>();
-builder.Services.AddScoped<IOrderService, OrderService>();       // Thêm cho OrderService
-builder.Services.AddScoped<VnpayPayment>();                      // Thêm cho VNPAY
+builder.Services.AddScoped<IOrderService, OrderService>();       // ThÃªm cho OrderService
+builder.Services.AddScoped<VnpayPayment>();                      // ThÃªm cho VNPAY
 
 // Add HttpContextAccessor for session and IP address retrieval
 builder.Services.AddHttpContextAccessor();
@@ -66,11 +68,18 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+
+
 app.UseSession();
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+    endpoints.MapHub<NotificationHub>("/notificationHub"); 
+});
 
 app.Run();

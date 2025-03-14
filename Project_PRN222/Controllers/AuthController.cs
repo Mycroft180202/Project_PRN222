@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Project_PRN222.DTO;
+using Project_PRN222.Hubs;
 using Project_PRN222.Services.Interfaces;
 
 namespace Project_PRN222.Controllers
@@ -9,10 +11,12 @@ namespace Project_PRN222.Controllers
     public class AuthController : Controller
     {
         private readonly IAuthService _authService;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, IHubContext<NotificationHub> hubContext)
         {
             _authService = authService;
+            _hubContext = hubContext;
         }
 
         // --- Các endpoint trả về View cho ASP.NET MVC ---
@@ -28,12 +32,20 @@ namespace Project_PRN222.Controllers
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return View("Register", registerDto); // Trả về View với dữ liệu đã nhập nếu validation thất bại
+                }
+
                 var user = await _authService.Register(registerDto);
-                return Ok(new { Message = "Registration successful", UserId = user.UserId });
+                await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Registration successful");
+                return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Message = ex.Message });
+                TempData["Error"] = ex.Message; // Lưu lỗi vào TempData
+                await _hubContext.Clients.All.SendAsync("ReceiveMessage", $"Error: {ex.Message}");
+                return View("Register", registerDto); // Trả về View với dữ liệu đã nhập
             }
         }
 
@@ -48,6 +60,11 @@ namespace Project_PRN222.Controllers
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return View("Login", loginDto); // Trả về View nếu validation thất bại
+                }
+
                 var user = await _authService.Login(loginDto);
                 if (user.RoleId == 1)
                 {
@@ -64,7 +81,8 @@ namespace Project_PRN222.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Message = ex.Message });
+                TempData["Error"] = ex.Message; // Lưu lỗi vào TempData
+                return View("Login", loginDto); // Trả về View với dữ liệu đã nhập
             }
         }
 
@@ -79,12 +97,19 @@ namespace Project_PRN222.Controllers
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return View("ForgotPassword", forgotPasswordDto); // Trả về View nếu validation thất bại
+                }
+
                 await _authService.GeneratePasswordResetCode(forgotPasswordDto.Email);
-                return Ok(new { Message = "Reset code sent to email" });
+                TempData["Success"] = "Reset code sent to email"; // Thông báo thành công
+                return View("ForgotPassword"); // Trả về View
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Message = ex.Message });
+                TempData["Error"] = ex.Message; // Lưu lỗi vào TempData
+                return View("ForgotPassword", forgotPasswordDto); // Trả về View với dữ liệu đã nhập
             }
         }
 
@@ -99,16 +124,23 @@ namespace Project_PRN222.Controllers
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return View("ResetPassword", resetDto); // Trả về View nếu validation thất bại
+                }
+
                 var result = await _authService.ResetPassword(resetDto);
-                return Ok(new { Message = "Password reset successful" });
+                TempData["Success"] = "Password reset successful"; // Thông báo thành công
+                return RedirectToAction("Login"); // Chuyển hướng về Login sau khi reset thành công
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Message = ex.Message });
+                TempData["Error"] = ex.Message; // Lưu lỗi vào TempData
+                return View("ResetPassword", resetDto); // Trả về View với dữ liệu đã nhập
             }
         }
 
-        // --- Các endpoint API trả về JSON cho React ---
+        // --- Các endpoint API trả về JSON cho React (giữ nguyên) ---
 
         [HttpPost("api/register")]
         public async Task<IActionResult> ApiRegister([FromBody] RegisterDto registerDto)
@@ -130,13 +162,11 @@ namespace Project_PRN222.Controllers
             try
             {
                 var user = await _authService.Login(loginDto);
-                // Trả về JSON thay vì redirect
                 return Ok(new
                 {
                     Message = "Login successful",
                     UserId = user.UserId,
                     RoleId = user.RoleId
-                    // Nếu dùng JWT, bạn có thể thêm accessToken và refreshToken ở đây
                 });
             }
             catch (Exception ex)
