@@ -15,10 +15,12 @@ namespace Project_PRN222.Controllers
             _authService = authService;
         }
 
-        [HttpGet("register")] // Action to return Register View
+        // --- Các endpoint trả về View cho ASP.NET MVC ---
+
+        [HttpGet("register")]
         public IActionResult Register()
         {
-            return View("Register"); // Assuming you have a Register.cshtml view in Views/Auth
+            return View("Register"); // Trả về Register.cshtml
         }
 
         [HttpPost("register")]
@@ -35,10 +37,10 @@ namespace Project_PRN222.Controllers
             }
         }
 
-        [HttpGet("login")] // Action to return Login View
+        [HttpGet("login")]
         public IActionResult Login()
         {
-            return View("Login"); // Assuming you have a Login.cshtml view in Views/Auth
+            return View("Login"); // Trả về Login.cshtml
         }
 
         [HttpPost("login")]
@@ -47,18 +49,17 @@ namespace Project_PRN222.Controllers
             try
             {
                 var user = await _authService.Login(loginDto);
-                // Redirect based on role after login
                 if (user.RoleId == 1)
                 {
-                    return RedirectToAction("AdminDashboard", "Home"); // Redirect to Admin Dashboard
+                    return RedirectToAction("AdminDashboard", "Home");
                 }
                 else if (user.RoleId == 2)
                 {
-                    return RedirectToAction("VendorDashboard", "Home"); // Redirect to Vendor Dashboard
+                    return RedirectToAction("VendorDashboard", "Home");
                 }
                 else
                 {
-                    return RedirectToAction("Index", "Home"); // Redirect to Home page for regular users
+                    return RedirectToAction("Index", "Home");
                 }
             }
             catch (Exception ex)
@@ -67,14 +68,14 @@ namespace Project_PRN222.Controllers
             }
         }
 
-        [HttpGet("forgot-password")] // Action to return ForgotPassword View
+        [HttpGet("forgot-password")]
         public IActionResult ForgotPassword()
         {
-            return View("ForgotPassword"); // Assuming you have a ForgotPassword.cshtml view in Views/Auth
+            return View("ForgotPassword"); // Trả về ForgotPassword.cshtml
         }
 
         [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
+        public async Task<IActionResult> ForgotPassword([FromForm] ForgotPasswordDto forgotPasswordDto)
         {
             try
             {
@@ -87,14 +88,79 @@ namespace Project_PRN222.Controllers
             }
         }
 
-        [HttpGet("reset-password")] // Action to return ResetPassword View
+        [HttpGet("reset-password")]
         public IActionResult ResetPassword()
         {
-            return View("ResetPassword"); // Assuming you have a ResetPassword.cshtml view in Views/Auth
+            return View("ResetPassword"); // Trả về ResetPassword.cshtml
         }
 
         [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetDto)
+        public async Task<IActionResult> ResetPassword([FromForm] ResetPasswordDto resetDto)
+        {
+            try
+            {
+                var result = await _authService.ResetPassword(resetDto);
+                return Ok(new { Message = "Password reset successful" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+        // --- Các endpoint API trả về JSON cho React ---
+
+        [HttpPost("api/register")]
+        public async Task<IActionResult> ApiRegister([FromBody] RegisterDto registerDto)
+        {
+            try
+            {
+                var user = await _authService.Register(registerDto);
+                return Ok(new { Message = "Registration successful", UserId = user.UserId });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+        [HttpPost("api/login")]
+        public async Task<IActionResult> ApiLogin([FromBody] LoginDto loginDto)
+        {
+            try
+            {
+                var user = await _authService.Login(loginDto);
+                // Trả về JSON thay vì redirect
+                return Ok(new
+                {
+                    Message = "Login successful",
+                    UserId = user.UserId,
+                    RoleId = user.RoleId
+                    // Nếu dùng JWT, bạn có thể thêm accessToken và refreshToken ở đây
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+        [HttpPost("api/forgot-password")]
+        public async Task<IActionResult> ApiForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
+        {
+            try
+            {
+                await _authService.GeneratePasswordResetCode(forgotPasswordDto.Email);
+                return Ok(new { Message = "Reset code sent to email" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+        [HttpPost("api/reset-password")]
+        public async Task<IActionResult> ApiResetPassword([FromBody] ResetPasswordDto resetDto)
         {
             try
             {
