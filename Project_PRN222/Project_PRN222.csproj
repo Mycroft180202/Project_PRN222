@@ -62,15 +62,4 @@
     <None Include="wwwroot\img\SẢN PHẨM\NÓN LÁ\4\.DS_Store" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Update="wwwroot\login.html">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Update="wwwroot\forgot-password.html">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
-
 </Project>
