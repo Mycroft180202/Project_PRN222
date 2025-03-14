@@ -26,6 +26,8 @@ public partial class User
     public bool? IsActive { get; set; }
 
     public int? RoleId { get; set; }
+    public string? PasswordResetCode { get; set; }
+    public DateTime? ResetCodeExpiry { get; set; }
 
     public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 

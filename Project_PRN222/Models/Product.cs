@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Project_PRN222.Models;
 
@@ -19,13 +20,18 @@ public partial class Product
 
     public int? CategoryId { get; set; }
 
+    public int? VendorId { get; set; } 
+
     public DateTime? CreatedDate { get; set; }
 
     public DateTime? UpdatedDate { get; set; }
 
+    [JsonIgnore]
     public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 
     public virtual Category? Category { get; set; }
+
+    public virtual Vendor? Vendor { get; set; } // Thay User bằng Vendor
 
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
