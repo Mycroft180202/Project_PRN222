@@ -28,4 +28,49 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\10\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\11\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\2\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\3\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\4\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\5\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\6\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\7\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\8\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\9\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\LỤA\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\LỤA\1\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\LỤA\2\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\LỤA\3\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\10\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\1\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\2\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\3\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\4\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\5\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\6\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\7\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\8\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\9\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\NÓN LÁ\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\NÓN LÁ\1\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\NÓN LÁ\2\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\NÓN LÁ\3\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\NÓN LÁ\4\.DS_Store" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\login.html">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\forgot-password.html">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
