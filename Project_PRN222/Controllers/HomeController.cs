@@ -40,6 +40,10 @@ namespace Project_PRN222.Controllers
         {
             return View(); // Returns Views/Home/Privacy.cshtml
         }
+        public IActionResult Contact()
+        {
+            return View(); // Returns Views/Home/Privacy.cshtml
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
