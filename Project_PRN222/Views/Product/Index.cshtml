@@ -1,79 +1,79 @@
-﻿@model IEnumerable<Project_PRN222.DTO.ProductDto>
+﻿    @model IEnumerable<Project_PRN222.DTO.ProductDto>
 
-@{
-    ViewData["Title"] = "Product List";
-}
-
-<h1>Product List</h1>
-
-<p>
-    @if (User.IsInRole("Admin") || User.IsInRole("Vendor"))
-    {
-        <a asp-action="Create">Create New Product</a>
+    @{
+        ViewData["Title"] = "Product List";
     }
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ProductName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Price)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StockQuantity)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ImageUrl)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ProductName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Price)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.StockQuantity)
-                </td>
-                <td>
-                    @if (!string.IsNullOrEmpty(item.ImageUrl))
-                    {
-                        <img src="@item.ImageUrl" alt="@item.ProductName" style="max-width: 50px; max-height: 50px;" />
-                    }
-                </td>
-                <td>
-                    @using (Html.BeginForm("AddToCart", "Cart", FormMethod.Post))
-                    {
-                        @Html.Hidden("productId", item.ProductId)
-                        @Html.Hidden("quantity", 1)
-                        <button type="submit" class="btn btn-sm btn-primary">Add to Cart</button>
-                    }
-                    @if (User.IsInRole("Admin") || User.IsInRole("Vendor"))
-                    {
-                        <a asp-action="Edit" asp-route-id="@item.ProductId">Edit</a>
-                        <a asp-action="DeleteConfirmation" asp-route-id="@item.ProductId">Delete</a>
-                    }
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
 
-<div>
-    <a asp-controller="Cart" asp-action="CartView">View Cart</a> |
-    <a asp-controller="Order" asp-action="CheckoutView">Checkout</a>
-</div>
+    <h1>Product List</h1>
+
+    <p>
+        @if (User.IsInRole("Admin") || User.IsInRole("Vendor"))
+        {
+            <a asp-action="Create">Create New Product</a>
+        }
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Description)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Price)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.StockQuantity)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ImageUrl)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ProductName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.StockQuantity)
+                    </td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                        {
+                            <img src="@item.ImageUrl" alt="@item.ProductName" style="max-width: 50px; max-height: 50px;" />
+                        }
+                    </td>
+                    <td>
+                        @using (Html.BeginForm("AddToCart", "Cart", FormMethod.Post))
+                        {
+                            @Html.Hidden("productId", item.ProductId)
+                            @Html.Hidden("quantity", 1)
+                            <button type="submit" class="btn btn-sm btn-primary">Add to Cart</button>
+                        }
+                        @if (User.IsInRole("Admin") || User.IsInRole("Vendor"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.ProductId">Edit</a>
+                            <a asp-action="DeleteConfirmation" asp-route-id="@item.ProductId">Delete</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div>
+        <a asp-controller="Cart" asp-action="CartView">View Cart</a> |
+        <a asp-controller="Order" asp-action="CheckoutView">Checkout</a>
+    </div>
