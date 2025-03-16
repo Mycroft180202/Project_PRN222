@@ -6,6 +6,7 @@ using Project_PRN222.Services.Implementations;
 using Project_PRN222.Services.Interfaces;
 using Project_PRN222.Services;
 using Project_PRN222.Hubs;
+using Microsoft.AspNetCore.Authentication.Cookies; // Thêm namespace này
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,16 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
 builder.Services.AddDbContext<ProjectPrn222Context>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DB")));
+
+// Thêm xác thực với Cookie Authentication
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Auth/Login"; // Đường dẫn đến trang đăng nhập
+        options.LogoutPath = "/Auth/Logout"; // Đường dẫn đến trang đăng xuất
+        options.AccessDeniedPath = "/Home/AccessDenied"; // Trang khi bị từ chối truy cập
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Thời gian hết hạn của cookie
+    });
 
 // Add session
 builder.Services.AddDistributedMemoryCache();
@@ -30,9 +41,9 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IVendorRepository, VendorRepository>();
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();       // Thêm cho Order
-builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>(); // Thêm cho OrderItem
-builder.Services.AddScoped<IDeliveryRepository, DeliveryRepository>();   // Thêm cho Delivery
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+builder.Services.AddScoped<IDeliveryRepository, DeliveryRepository>();
 
 // Register services
 builder.Services.AddScoped<IProductService, ProductService>();
@@ -42,8 +53,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IVendorService, VendorService>();
-builder.Services.AddScoped<IOrderService, OrderService>();       // Thêm cho OrderService
-builder.Services.AddScoped<VnpayPayment>();                      // Thêm cho VNPAY
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<VnpayPayment>();
 
 // Add HttpContextAccessor for session and IP address retrieval
 builder.Services.AddHttpContextAccessor();
@@ -68,8 +79,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-
-
+// Thêm middleware xác thực trước ủy quyền
+app.UseAuthentication(); // Thêm dòng này
 app.UseSession();
 app.UseAuthorization();
 
@@ -79,7 +90,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
-    endpoints.MapHub<NotificationHub>("/notificationHub"); 
+    endpoints.MapHub<NotificationHub>("/notificationHub");
 });
 
 app.Run();

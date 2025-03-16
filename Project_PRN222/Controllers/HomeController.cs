@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Project_PRN222.Attributes;
 using Project_PRN222.Models;
 using System.Diagnostics;
@@ -20,16 +20,16 @@ namespace Project_PRN222.Controllers
         }
 
         // Admin Dashboard View
-        [HttpGet("AdminDashboard")]
-        [RoleAuthorize(1)] // Admin only access
+        [HttpGet("Home/AdminDashboard")]
+        //[RoleAuthorize(1)] // Admin only access
         public IActionResult AdminDashboard()
         {
             return View("AdminDashboard"); // Assuming you have AdminDashboard.cshtml in Views/Home
         }
 
         // Vendor Dashboard View
-        [HttpGet("VendorDashboard")]
-        [RoleAuthorize(2)] // Vendor only access
+        [HttpGet("Home/VendorDashboard")]
+        //[RoleAuthorize(2)] // Vendor only access
         public IActionResult VendorDashboard()
         {
             return View("VendorDashboard"); // Assuming you have VendorDashboard.cshtml in Views/Home
@@ -39,6 +39,10 @@ namespace Project_PRN222.Controllers
         public IActionResult Privacy()
         {
             return View(); // Returns Views/Home/Privacy.cshtml
+        }
+        public IActionResult Contact()
+        {
+            return View(); // Returns Views/Home/Contact.cshtml
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

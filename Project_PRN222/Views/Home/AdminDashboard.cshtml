@@ -1,5 +1,849 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Admin Dashboard - EShopper";
+    Layout = null; // Disable default layout
+
+    // Static data for interface display (Backend Note: Replace these mock data with real data from services like IUserService, IProductService, and ISalesStatisticsService)
+    var mockUsers = new List<dynamic>
+    {
+        new { UserId = 1, UserName = "johndoe", Email = "john@example.com", FirstName = "John", LastName = "Doe", PhoneNumber = "+123456789", Address = "123 Main St", IsActive = true, RoleId = 1 }
+    };
+
+    var mockProducts = new List<dynamic>
+    {
+        new { ProductId = 1, ProductName = "Sample Product", Description = "Beautiful handmade item", Price = 50.00M, StockQuantity = 100, ImageUrl = "/img/product-1.jpg", CategoryId = 1, CreatedDate = DateTime.Parse("2023-01-01"), UpdatedDate = DateTime.Parse("2023-01-02") }
+    };
+
+    var mockSalesStatistics = new List<dynamic>
+    {
+        new { StatisticId = 1, ReportDate = DateTime.Parse("2023-01-01"), ProductId = 1, CategoryId = 1, TotalQuantitySold = 50, TotalRevenue = 2500.00M, TimeDimension = "Monthly" }
+    };
 }
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>@ViewData["Title"]</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Admin Management" name="keywords">
+    <meta content="Admin dashboard for managing products, users, and sales statistics" name="description">
+
+    <!-- Favicon -->
+    <link href="~/img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Stylesheet -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main Container */
+        .container-fluid {
+            padding: 0;
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            padding: 20px 0;
+            flex-shrink: 0;
+        }
+
+            .sidebar h4 {
+                color: #1a73e8;
+                font-weight: 600;
+                padding: 0 20px 20px;
+                margin: 0;
+                border-bottom: 1px solid #e0e7ff;
+            }
+
+            .sidebar a {
+                color: #555;
+                padding: 12px 20px;
+                display: block;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                cursor: pointer;
+            }
+
+                .sidebar a:hover, .sidebar a.active {
+                    background-color: #e0e7ff;
+                    color: #1a73e8;
+                }
+
+        /* Main Content */
+        .content {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+            .content h2 {
+                color: #1a73e8;
+                font-weight: 600;
+                margin-bottom: 30px;
+                text-align: center;
+            }
+
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            background-color: #ffffff;
+            margin-bottom: 30px;
+        }
+
+        .card-header {
+            background-color: #f8fbff;
+            border-bottom: none;
+            padding: 15px 20px;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .card-header h3 {
+                color: #1a73e8;
+                font-weight: 500;
+                margin: 0;
+            }
+
+        .btn-primary {
+            background-color: #1a73e8;
+            border-color: #1a73e8;
+            border-radius: 5px;
+            padding: 8px 20px;
+            transition: all 0.3s ease;
+        }
+
+            .btn-primary:hover {
+                background-color: #1557b0;
+                border-color: #1557b0;
+            }
+
+        .btn-warning {
+            background-color: #ffca28;
+            border-color: #ffca28;
+            color: #333;
+            padding: 6px 12px;
+        }
+
+        .btn-danger {
+            background-color: #ff5252;
+            border-color: #ff5252;
+            padding: 6px 12px;
+        }
+
+        .table {
+            background-color: #ffffff;
+            border-radius: 0 0 10px 10px;
+            margin-bottom: 0;
+        }
+
+            .table thead th {
+                background-color: #e0e7ff;
+                color: #1a73e8;
+                font-weight: 500;
+                border: none;
+                padding: 12px;
+            }
+
+            .table tbody tr:hover {
+                background-color: #f8fbff;
+            }
+
+            .table td {
+                vertical-align: middle;
+                padding: 12px;
+            }
+
+        /* Modal */
+        .modal-content {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            background-color: #f8fbff;
+            border-bottom: none;
+            border-radius: 10px 10px 0 0;
+            padding: 15px 20px;
+        }
+
+        .modal-title {
+            color: #1a73e8;
+            font-weight: 500;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            border: 1px solid #e0e7ff;
+            padding: 10px;
+            width: 100%;
+        }
+
+            .form-control:focus {
+                border-color: #1a73e8;
+                box-shadow: 0 0 5px rgba(26, 115, 232, 0.3);
+            }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Main Container -->
+    <div class="container-fluid">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h4>Admin Dashboard</h4>
+            <a class="nav-link active" data-tab="users">User Management</a>
+            <a class="nav-link" data-tab="products">Product Management</a>
+            <a class="nav-link" data-tab="sales-statistics">Sales Statistics</a>
+            <!-- Backend Note: Ensure the AuthController has a Logout action to handle this POST request -->
+            <form asp-action="Logout" asp-controller="Auth" method="post" style="margin: 0;">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="nav-link" style="border: none; background: none; width: 100%; text-align: left;">Logout</button>
+            </form>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <h2>Admin Management</h2>
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+                <!-- User Management Tab -->
+                <div class="tab-pane fade show active" id="users">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Users</h3>
+                            <!-- Backend Note: Link to a UserController's Create action for adding new users -->
+                            <a class="btn btn-primary" href="@Url.Action("Create", "User")">Add User</a>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Username</th>
+                                            <th>Email</th>
+                                            <th>First Name</th>
+                                            <th>Last Name</th>
+                                            <th>Phone Number</th>
+                                            <th>Address</th>
+                                            <th>Active</th>
+                                            <th>Role</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Backend Note: Replace this foreach loop with data from IUserService -->
+                                        @foreach (var user in mockUsers)
+                                        {
+                                            <tr>
+                                                <td>@user.UserId</td>
+                                                <td>@user.UserName</td>
+                                                <td>@user.Email</td>
+                                                <td>@user.FirstName</td>
+                                                <td>@user.LastName</td>
+                                                <td>@user.PhoneNumber</td>
+                                                <td>@user.Address</td>
+                                                <td>@(user.IsActive ? "Yes" : "No")</td>
+                                                <td>@user.RoleId</td>
+                                                <td>
+                                                    <!-- Backend Note: Link to UserController's EditRoleView and Delete actions -->
+                                                    <a class="btn btn-warning mr-2" href="@Url.Action("EditRoleView", "User", new { id = user.UserId })">Edit</a>
+                                                    <a class="btn btn-danger" href="@Url.Action("Delete", "User", new { id = user.UserId })">Delete</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Management Tab -->
+                <div class="tab-pane fade" id="products">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Products</h3>
+                            <!-- Backend Note: Link to a ProductController's CreateView action for adding new products -->
+                            <a class="btn btn-primary" href="@Url.Action("CreateView", "Product")">Add Product</a>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Description</th>
+                                            <th>Price</th>
+                                            <th>Stock Quantity</th>
+                                            <th>Image</th>
+                                            <th>Category</th>
+                                            <th>Created Date</th>
+                                            <th>Updated Date</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Backend Note: Replace this foreach loop with data from IProductService -->
+                                        @foreach (var product in mockProducts)
+                                        {
+                                            <tr>
+                                                <td>@product.ProductId</td>
+                                                <td>@product.ProductName</td>
+                                                <td>@product.Description</td>
+                                                <td>@product.Price</td>
+                                                <td>@product.StockQuantity</td>
+                                                <td>@product.ImageUrl</td>
+                                                <td>@product.CategoryId</td>
+                                                <td>@product.CreatedDate.ToString("yyyy-MM-dd")</td>
+                                                <td>@product.UpdatedDate.ToString("yyyy-MM-dd")</td>
+                                                <td>
+                                                    <!-- Backend Note: Link to ProductController's EditView and DeleteProductApi actions -->
+                                                    <a class="btn btn-warning mr-2" href="@Url.Action("EditView", "Product", new { id = product.ProductId })">Edit</a>
+                                                    <a class="btn btn-danger" href="@Url.Action("DeleteProduct", "Product", new { id = product.ProductId })">Delete</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sales Statistics Tab -->
+                <div class="tab-pane fade" id="sales-statistics">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Sales Statistics</h3>
+                            <!-- Backend Note: Add functionality to open modal and link to SalesStatisticsController's Create action -->
+                            <button class="btn btn-primary" data-toggle="modal" data-target="#addSalesStatisticModal">Add Statistic</button>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Report Date</th>
+                                            <th>Product ID</th>
+                                            <th>Category ID</th>
+                                            <th>Total Quantity Sold</th>
+                                            <th>Total Revenue</th>
+                                            <th>Time Dimension</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Backend Note: Replace this foreach loop with data from ISalesStatisticsService -->
+                                        @foreach (var stat in mockSalesStatistics)
+                                        {
+                                            <tr>
+                                                <td>@stat.StatisticId</td>
+                                                <td>@stat.ReportDate.ToString("yyyy-MM-dd")</td>
+                                                <td>@stat.ProductId</td>
+                                                <td>@stat.CategoryId</td>
+                                                <td>@stat.TotalQuantitySold</td>
+                                                <td>@stat.TotalRevenue</td>
+                                                <td>@stat.TimeDimension</td>
+                                                <td>
+                                                    <!-- Backend Note: Add functionality to open edit modal and link to SalesStatisticsController's Edit and Delete actions -->
+                                                    <button class="btn btn-warning mr-2" data-toggle="modal" data-target="#editSalesStatisticModal">Edit</button>
+                                                    <a class="btn btn-danger" href="#">Delete</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Product Modal -->
+    <div class="modal fade" id="addProductModal" tabindex="-1" role="dialog" aria-labelledby="addProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addProductModalLabel">Add New Product</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Backend Note: Form submission should be handled by ProductController's CreateProductApi action -->
+                    <form id="addProductForm" asp-action="CreateProductApi" asp-controller="Product" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="productName">Product Name</label>
+                                    <input type="text" class="form-control" id="productName" name="ProductName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="price">Price</label>
+                                    <input type="number" class="form-control" id="price" name="Price" step="0.01" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="stockQuantity">Stock Quantity</label>
+                                    <input type="number" class="form-control" id="stockQuantity" name="StockQuantity" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="categoryId">Category ID</label>
+                                    <input type="number" class="form-control" id="categoryId" name="CategoryId" required>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="imageUrl">Image URL</label>
+                                    <input type="text" class="form-control" id="imageUrl" name="ImageUrl" required>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="description">Description</label>
+                                    <textarea class="form-control" id="description" name="Description" rows="3" required></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Product</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div class="modal fade" id="editProductModal" tabindex="-1" role="dialog" aria-labelledby="editProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProductModalLabel">Edit Product</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Backend Note: Form submission should be handled by ProductController's UpdateProductApi action. Populate fields with existing product data using JavaScript or backend logic -->
+                    <form id="editProductForm" asp-action="UpdateProductApi" asp-controller="Product" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" id="editProductId" name="ProductId">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editProductName">Product Name</label>
+                                    <input type="text" class="form-control" id="editProductName" name="ProductName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editPrice">Price</label>
+                                    <input type="number" class="form-control" id="editPrice" name="Price" step="0.01" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editStockQuantity">Stock Quantity</label>
+                                    <input type="number" class="form-control" id="editStockQuantity" name="StockQuantity" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editCategoryId">Category ID</label>
+                                    <input type="number" class="form-control" id="editCategoryId" name="CategoryId" required>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="editImageUrl">Image URL</label>
+                                    <input type="text" class="form-control" id="editImageUrl" name="ImageUrl" required>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="editDescription">Description</label>
+                                    <textarea class="form-control" id="editDescription" name="Description" rows="3" required></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Update Product</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Backend Note: Form submission should be handled by UserController's Create action -->
+                    <form id="addUserForm" asp-action="Create" asp-controller="User" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="userName">Username</label>
+                                    <input type="text" class="form-control" id="userName" name="UserName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="passwordHash">Password</label>
+                                    <input type="password" class="form-control" id="passwordHash" name="PasswordHash" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="email">Email</label>
+                                    <input type="email" class="form-control" id="email" name="Email" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="phoneNumber">Phone Number</label>
+                                    <input type="text" class="form-control" id="phoneNumber" name="PhoneNumber" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="firstName">First Name</label>
+                                    <input type="text" class="form-control" id="firstName" name="FirstName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="lastName">Last Name</label>
+                                    <input type="text" class="form-control" id="lastName" name="LastName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="address">Address</label>
+                                    <input type="text" class="form-control" id="address" name="Address" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="isActive">Active</label>
+                                    <select class="form-control" id="isActive" name="IsActive" required>
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="roleId">Role ID</label>
+                                    <input type="number" class="form-control" id="roleId" name="RoleId" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save User</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Backend Note: Form submission should be handled by UserController's UpdateUserRole action. Populate fields with existing user data -->
+                    <form id="editUserForm" asp-action="UpdateUserRole" asp-controller="User" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" id="editUserId" name="id">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editUserName">Username</label>
+                                    <input type="text" class="form-control" id="editUserName" name="UserName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editPasswordHash">Password</label>
+                                    <input type="password" class="form-control" id="editPasswordHash" name="PasswordHash" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editEmail">Email</label>
+                                    <input type="email" class="form-control" id="editEmail" name="Email" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editPhoneNumber">Phone Number</label>
+                                    <input type="text" class="form-control" id="editPhoneNumber" name="PhoneNumber" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editFirstName">First Name</label>
+                                    <input type="text" class="form-control" id="editFirstName" name="FirstName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editLastName">Last Name</label>
+                                    <input type="text" class="form-control" id="editLastName" name="LastName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="editAddress">Address</label>
+                                    <input type="text" class="form-control" id="editAddress" name="Address" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editIsActive">Active</label>
+                                    <select class="form-control" id="editIsActive" name="IsActive" required>
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editRoleId">Role ID</label>
+                                    <input type="number" class="form-control" id="editRoleId" name="newRoleId" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Update User</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Sales Statistic Modal -->
+    <div class="modal fade" id="addSalesStatisticModal" tabindex="-1" role="dialog" aria-labelledby="addSalesStatisticModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addSalesStatisticModalLabel">Add Sales Statistic</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Backend Note: Form submission should be handled by SalesStatisticsController's Create action -->
+                    <form id="addSalesStatisticForm" asp-action="Create" asp-controller="SalesStatistics" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="reportDate">Report Date</label>
+                                    <input type="date" class="form-control" id="reportDate" name="ReportDate" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="productId">Product ID</label>
+                                    <input type="number" class="form-control" id="productId" name="ProductId" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="categoryId">Category ID</label>
+                                    <input type="number" class="form-control" id="categoryId" name="CategoryId" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="totalQuantitySold">Total Quantity Sold</label>
+                                    <input type="number" class="form-control" id="totalQuantitySold" name="TotalQuantitySold" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <
+```html
+label for="totalRevenue">Total Revenue</label>
+                                    <input type="number" class="form-control" id="totalRevenue" name="TotalRevenue" step="0.01" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="timeDimension">Time Dimension</label>
+                                    <select class="form-control" id="timeDimension" name="TimeDimension" required>
+                                        <option value="Daily">Daily</option>
+                                        <option value="Weekly">Weekly</option>
+                                        <option value="Monthly">Monthly</option>
+                                        <option value="Yearly">Yearly</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Statistic</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Sales Statistic Modal -->
+    <div class="modal fade" id="editSalesStatisticModal" tabindex="-1" role="dialog" aria-labelledby="editSalesStatisticModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editSalesStatisticModalLabel">Edit Sales Statistic</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Backend Note: Form submission should be handled by SalesStatisticsController's Edit action. Populate fields with existing statistic data -->
+                    <form id="editSalesStatisticForm" asp-action="Edit" asp-controller="SalesStatistics" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" id="editStatisticId" name="StatisticId">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editReportDate">Report Date</label>
+                                    <input type="date" class="form-control" id="editReportDate" name="ReportDate" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editProductId">Product ID</label>
+                                    <input type="number" class="form-control" id="editProductId" name="ProductId" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editCategoryId">Category ID</label>
+                                    <input type="number" class="form-control" id="editCategoryId" name="CategoryId" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editTotalQuantitySold">Total Quantity Sold</label>
+                                    <input type="number" class="form-control" id="editTotalQuantitySold" name="TotalQuantitySold" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editTotalRevenue">Total Revenue</label>
+                                    <input type="number" class="form-control" id="editTotalRevenue" name="TotalRevenue" step="0.01" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editTimeDimension">Time Dimension</label>
+                                    <select class="form-control" id="editTimeDimension" name="TimeDimension" required>
+                                        <option value="Daily">Daily</option>
+                                        <option value="Weekly">Weekly</option>
+                                        <option value="Monthly">Monthly</option>
+                                        <option value="Yearly">Yearly</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Update Statistic</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Libraries for Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.nav-link').on('click', function () {
+                var target = $(this).data('tab');
+                $('.tab-pane').removeClass('show active');
+                $('.nav-link').removeClass('active');
+                $('#' + target).addClass('show active');
+                $(this).addClass('active');
+            });
+        });
+    </script>
+</body>
+</html>
