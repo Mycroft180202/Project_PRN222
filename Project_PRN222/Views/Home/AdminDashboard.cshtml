@@ -36,17 +36,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Stylesheet -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"> <!-- Cập nhật Font Awesome 6 -->
+    <!-- Bootstrap 5 Stylesheet (Cập nhật lên Bootstrap 5) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom Styles -->
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f0f4f8;
-            color: #333;
+            background-color: #e8ecef; /* Màu sữa */
+            color: #333333; /* Đen */
             margin: 0;
             padding: 0;
         }
@@ -61,32 +60,38 @@
         /* Sidebar */
         .sidebar {
             width: 250px;
-            background-color: #ffffff;
+            background-color: #ffffff; /* Trắng */
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
             padding: 20px 0;
             flex-shrink: 0;
         }
 
             .sidebar h4 {
-                color: #1a73e8;
+                color: #333333; /* Đen */
                 font-weight: 600;
                 padding: 0 20px 20px;
                 margin: 0;
-                border-bottom: 1px solid #e0e7ff;
+                border-bottom: 1px solid #e8ecef; /* Sữa */
             }
 
             .sidebar a {
-                color: #555;
+                color: #333333; /* Đen */
                 padding: 12px 20px;
-                display: block;
+                display: flex;
+                align-items: center;
                 text-decoration: none;
                 transition: all 0.3s ease;
                 cursor: pointer;
             }
 
-                .sidebar a:hover, .sidebar a.active {
-                    background-color: #e0e7ff;
-                    color: #1a73e8;
+                .sidebar a i {
+                    margin-right: 10px;
+                }
+
+                .sidebar a:hover,
+                .sidebar a.active {
+                    background-color: #e8ecef; /* Sữa */
+                    color: #333333; /* Đen */
                 }
 
         /* Main Content */
@@ -94,10 +99,11 @@
             flex-grow: 1;
             padding: 30px;
             overflow-y: auto;
+            background-color: #e8ecef; /* Sữa */
         }
 
             .content h2 {
-                color: #1a73e8;
+                color: #333333; /* Đen */
                 font-weight: 600;
                 margin-bottom: 30px;
                 text-align: center;
@@ -107,12 +113,18 @@
             border: none;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            background-color: #ffffff;
+            background-color: #ffffff; /* Trắng */
             margin-bottom: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
+            .card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            }
+
         .card-header {
-            background-color: #f8fbff;
+            background-color: #333333; /* Đen */
             border-bottom: none;
             padding: 15px 20px;
             border-radius: 10px 10px 0 0;
@@ -122,53 +134,66 @@
         }
 
             .card-header h3 {
-                color: #1a73e8;
+                color: #ffffff; /* Trắng */
                 font-weight: 500;
                 margin: 0;
             }
 
         .btn-primary {
-            background-color: #1a73e8;
-            border-color: #1a73e8;
+            background-color: #333333; /* Đen */
+            border-color: #333333;
             border-radius: 5px;
             padding: 8px 20px;
+            color: #ffffff; /* Trắng */
             transition: all 0.3s ease;
         }
 
             .btn-primary:hover {
-                background-color: #1557b0;
-                border-color: #1557b0;
+                background-color: #555555; /* Đen sáng hơn */
+                border-color: #555555;
             }
 
         .btn-warning {
-            background-color: #ffca28;
-            border-color: #ffca28;
-            color: #333;
+            background-color: #e8ecef; /* Sữa */
+            border-color: #e8ecef;
+            color: #333333; /* Đen */
             padding: 6px 12px;
+            transition: all 0.3s ease;
         }
+
+            .btn-warning:hover {
+                background-color: #d3d7dc; /* Sữa đậm hơn */
+                border-color: #d3d7dc;
+            }
 
         .btn-danger {
-            background-color: #ff5252;
-            border-color: #ff5252;
+            background-color: #ff4d4d; /* Đỏ để giữ sự nổi bật */
+            border-color: #ff4d4d;
             padding: 6px 12px;
+            transition: all 0.3s ease;
         }
 
+            .btn-danger:hover {
+                background-color: #e63946;
+                border-color: #e63946;
+            }
+
         .table {
-            background-color: #ffffff;
+            background-color: #ffffff; /* Trắng */
             border-radius: 0 0 10px 10px;
             margin-bottom: 0;
         }
 
             .table thead th {
-                background-color: #e0e7ff;
-                color: #1a73e8;
+                background-color: #e8ecef; /* Sữa */
+                color: #333333; /* Đen */
                 font-weight: 500;
                 border: none;
                 padding: 12px;
             }
 
             .table tbody tr:hover {
-                background-color: #f8fbff;
+                background-color: #f8f9fa; /* Sữa nhạt */
             }
 
             .table td {
@@ -181,22 +206,24 @@
             border-radius: 10px;
             border: none;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff; /* Trắng */
         }
 
         .modal-header {
-            background-color: #f8fbff;
+            background-color: #333333; /* Đen */
             border-bottom: none;
             border-radius: 10px 10px 0 0;
             padding: 15px 20px;
         }
 
         .modal-title {
-            color: #1a73e8;
+            color: #ffffff; /* Trắng */
             font-weight: 500;
         }
 
         .modal-body {
             padding: 20px;
+            background-color: #ffffff; /* Trắng */
         }
 
         .form-group {
@@ -205,20 +232,46 @@
 
         .form-control {
             border-radius: 5px;
-            border: 1px solid #e0e7ff;
+            border: 1px solid #e8ecef; /* Sữa */
             padding: 10px;
             width: 100%;
+            background-color: #fafafa; /* Sữa nhạt */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
             .form-control:focus {
-                border-color: #1a73e8;
-                box-shadow: 0 0 5px rgba(26, 115, 232, 0.3);
+                border-color: #333333; /* Đen */
+                box-shadow: 0 0 5px rgba(51, 51, 51, 0.3);
+                background-color: #ffffff; /* Trắng */
             }
 
         .modal-footer {
             padding: 15px 20px;
             border-top: none;
+            background-color: #ffffff; /* Trắng */
         }
+
+            .modal-footer .btn-secondary {
+                background-color: #e8ecef; /* Sữa */
+                border-color: #e8ecef;
+                color: #333333; /* Đen */
+            }
+
+                .modal-footer .btn-secondary:hover {
+                    background-color: #d3d7dc; /* Sữa đậm hơn */
+                    border-color: #d3d7dc;
+                }
+
+            .modal-footer .btn-primary {
+                background-color: #333333; /* Đen */
+                border-color: #333333;
+                color: #ffffff; /* Trắng */
+            }
+
+                .modal-footer .btn-primary:hover {
+                    background-color: #555555; /* Đen sáng hơn */
+                    border-color: #555555;
+                }
     </style>
 </head>
 
@@ -228,13 +281,13 @@
         <!-- Sidebar -->
         <div class="sidebar">
             <h4>Admin Dashboard</h4>
-            <a class="nav-link active" data-tab="users">User Management</a>
-            <a class="nav-link" data-tab="products">Product Management</a>
-            <a class="nav-link" data-tab="sales-statistics">Sales Statistics</a>
+            <a class="nav-link active" data-tab="users"><i class="fas fa-users"></i> User Management</a>
+            <a class="nav-link" data-tab="products"><i class="fas fa-box"></i> Product Management</a>
+            <a class="nav-link" data-tab="sales-statistics"><i class="fas fa-chart-line"></i> Sales Statistics</a>
             <!-- Backend Note: Ensure the AuthController has a Logout action to handle this POST request -->
             <form asp-action="Logout" asp-controller="Auth" method="post" style="margin: 0;">
                 @Html.AntiForgeryToken()
-                <button type="submit" class="nav-link" style="border: none; background: none; width: 100%; text-align: left;">Logout</button>
+                <button type="submit" class="nav-link" style="border: none; background: none; width: 100%; text-align: left;margin-left:20px"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </form>
         </div>
 
@@ -249,8 +302,7 @@
                     <div class="card">
                         <div class="card-header">
                             <h3>Users</h3>
-                            <!-- Backend Note: Link to a UserController's Create action for adding new users -->
-                            <a class="btn btn-primary" href="@Url.Action("Create", "User")">Add User</a>
+                            
                         </div>
                         <div class="card-body p-0">
                             <div class="table-responsive">
@@ -339,7 +391,7 @@
                                                 <td>
                                                     <!-- Backend Note: Link to ProductController's EditView and DeleteProductApi actions -->
                                                     <a class="btn btn-warning mr-2" href="@Url.Action("EditView", "Product", new { id = product.ProductId })">Edit</a>
-                                                    <a class="btn btn-danger" href="@Url.Action("DeleteProduct", "Product", new { id = product.ProductId })">Delete</a>
+                                                    <a class="btn btn-danger" href="@Url.Action("DeleteProductApi", "Product", new { id = product.ProductId })">Delete</a>
                                                 </td>
                                             </tr>
                                         }
@@ -356,7 +408,7 @@
                         <div class="card-header">
                             <h3>Sales Statistics</h3>
                             <!-- Backend Note: Add functionality to open modal and link to SalesStatisticsController's Create action -->
-                            <button class="btn btn-primary" data-toggle="modal" data-target="#addSalesStatisticModal">Add Statistic</button>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSalesStatisticModal">Add Statistic</button>
                         </div>
                         <div class="card-body p-0">
                             <div class="table-responsive">
@@ -387,7 +439,7 @@
                                                 <td>@stat.TimeDimension</td>
                                                 <td>
                                                     <!-- Backend Note: Add functionality to open edit modal and link to SalesStatisticsController's Edit and Delete actions -->
-                                                    <button class="btn btn-warning mr-2" data-toggle="modal" data-target="#editSalesStatisticModal">Edit</button>
+                                                    <button class="btn btn-warning mr-2" data-bs-toggle="modal" data-bs-target="#editSalesStatisticModal">Edit</button>
                                                     <a class="btn btn-danger" href="#">Delete</a>
                                                 </td>
                                             </tr>
@@ -403,14 +455,12 @@
     </div>
 
     <!-- Add Product Modal -->
-    <div class="modal fade" id="addProductModal" tabindex="-1" role="dialog" aria-labelledby="addProductModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+    <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="addProductModalLabel">Add New Product</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <!-- Backend Note: Form submission should be handled by ProductController's CreateProductApi action -->
@@ -455,7 +505,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Save Product</button>
                         </div>
                     </form>
@@ -465,14 +515,12 @@
     </div>
 
     <!-- Edit Product Modal -->
-    <div class="modal fade" id="editProductModal" tabindex="-1" role="dialog" aria-labelledby="editProductModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+    <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editProductModalLabel">Edit Product</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <!-- Backend Note: Form submission should be handled by ProductController's UpdateProductApi action. Populate fields with existing product data using JavaScript or backend logic -->
@@ -518,7 +566,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Update Product</button>
                         </div>
                     </form>
@@ -528,14 +576,12 @@
     </div>
 
     <!-- Add User Modal -->
-    <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <!-- Backend Note: Form submission should be handled by UserController's Create action -->
@@ -560,6 +606,8 @@
                                     <input type="email" class="form-control" id="email" name="Email" required>
                                 </div>
                             </div>
+                            <ி
+
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="phoneNumber">Phone Number</label>
@@ -601,7 +649,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Save User</button>
                         </div>
                     </form>
@@ -611,14 +659,12 @@
     </div>
 
     <!-- Edit User Modal -->
-    <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <!-- Backend Note: Form submission should be handled by UserController's UpdateUserRole action. Populate fields with existing user data -->
@@ -685,7 +731,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Update User</button>
                         </div>
                     </form>
@@ -695,14 +741,12 @@
     </div>
 
     <!-- Add Sales Statistic Modal -->
-    <div class="modal fade" id="addSalesStatisticModal" tabindex="-1" role="dialog" aria-labelledby="addSalesStatisticModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+    <div class="modal fade" id="addSalesStatisticModal" tabindex="-1" aria-labelledby="addSalesStatisticModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="addSalesStatisticModalLabel">Add Sales Statistic</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <!-- Backend Note: Form submission should be handled by SalesStatisticsController's Create action -->
@@ -735,9 +779,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <
-```html
-label for="totalRevenue">Total Revenue</label>
+                                    <label for="totalRevenue">Total Revenue</label>
                                     <input type="number" class="form-control" id="totalRevenue" name="TotalRevenue" step="0.01" required>
                                 </div>
                             </div>
@@ -754,7 +796,7 @@ label for="totalRevenue">Total Revenue</label>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Save Statistic</button>
                         </div>
                     </form>
@@ -764,14 +806,12 @@ label for="totalRevenue">Total Revenue</label>
     </div>
 
     <!-- Edit Sales Statistic Modal -->
-    <div class="modal fade" id="editSalesStatisticModal" tabindex="-1" role="dialog" aria-labelledby="editSalesStatisticModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+    <div class="modal fade" id="editSalesStatisticModal" tabindex="-1" aria-labelledby="editSalesStatisticModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editSalesStatisticModalLabel">Edit Sales Statistic</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <!-- Backend Note: Form submission should be handled by SalesStatisticsController's Edit action. Populate fields with existing statistic data -->
@@ -822,7 +862,7 @@ label for="totalRevenue">Total Revenue</label>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Update Statistic</button>
                         </div>
                     </form>
@@ -832,8 +872,8 @@ label for="totalRevenue">Total Revenue</label>
     </div>
 
     <!-- JavaScript Libraries for Bootstrap -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).ready(function () {
             $('.nav-link').on('click', function () {

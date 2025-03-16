@@ -2,39 +2,267 @@
 
 @{
     ViewData["Title"] = "Delete Confirmation";
+    Layout = null; // Disable default layout
 }
 
-<h1>Delete Confirmation</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>@ViewData["Title"] - EShopper</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Product Management" name="keywords">
+    <meta content="Delete a product in the EShopper system" name="description">
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Product</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductName)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ProductName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Price)
-        </dd>
-        <!-- Display other product properties as needed -->
-    </dl>
+    <!-- Favicon -->
+    <link href="~/img/favicon.ico" rel="icon">
 
-    <form asp-action="DeleteProductApi" asp-controller="Product" asp-route-id="@Model.ProductId" method="delete">
-        <input type="hidden" asp-for="ProductId" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Cancel</a>
-    </form>
-</div>
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom Styles (Đồng bộ với AdminDashboard.cshtml và VendorDashboard.cshtml) -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #e8ecef; /* Màu sữa */
+            color: #333333; /* Đen */
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+        }
+
+        .container-fluid {
+            padding: 20px;
+            width: 100%;
+            max-width: 1200px; /* Giới hạn chiều rộng tối đa */
+        }
+
+        .content {
+            width: 100%;
+            padding: 40px;
+            background: #ffffff; /* Trắng */
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+            .content h2 {
+                color: #333333; /* Đen */
+                font-weight: 700;
+                margin-bottom: 30px;
+                text-align: center;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            background-color: #ffffff; /* Trắng */
+            margin-bottom: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            }
+
+        .card-header {
+            background-color: #333333; /* Đen */
+            border-bottom: none;
+            padding: 15px 20px;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .card-header h3 {
+                color: #ffffff; /* Trắng */
+                font-weight: 500;
+                margin: 0;
+            }
+
+        .btn-primary {
+            background-color: #333333; /* Đen */
+            border-color: #333333;
+            border-radius: 5px;
+            padding: 8px 20px;
+            color: #ffffff; /* Trắng */
+            transition: all 0.3s ease;
+        }
+
+            .btn-primary:hover {
+                background-color: #555555; /* Đen sáng hơn */
+                border-color: #555555;
+            }
+
+        .btn-danger {
+            background-color: #ff4d4d; /* Đỏ để giữ sự nổi bật */
+            border-color: #ff4d4d;
+            border-radius: 5px;
+            padding: 8px 20px;
+            transition: all 0.3s ease;
+        }
+
+            .btn-danger:hover {
+                background-color: #e63946;
+                border-color: #e63946;
+            }
+
+        .btn-secondary {
+            background-color: #e8ecef; /* Sữa */
+            border-color: #e8ecef;
+            color: #333333; /* Đen */
+            border-radius: 5px;
+            padding: 8px 20px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+            .btn-secondary:hover {
+                background-color: #d3d7dc; /* Sữa đậm hơn */
+                border-color: #d3d7dc;
+            }
+
+        .dl-horizontal dt {
+            font-weight: 500;
+            color: #333333; /* Đen */
+        }
+
+        .dl-horizontal dd {
+            color: #555555; /* Đen nhạt */
+        }
+
+        hr {
+            border-top: 1px solid #e8ecef; /* Sữa */
+            margin: 20px 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            border: 1px solid #e8ecef; /* Sữa */
+            padding: 10px;
+            width: 100%;
+            background-color: #fafafa; /* Sữa nhạt */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .form-control:focus {
+                border-color: #333333; /* Đen */
+                box-shadow: 0 0 5px rgba(51, 51, 51, 0.3);
+                background-color: #ffffff; /* Trắng */
+            }
+
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Main Container -->
+    <div class="container-fluid">
+        <!-- Main Content -->
+        <div class="content">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Delete Confirmation</h3>
+                    <a class="btn btn-secondary" href="@Url.Action("Index", "Product")"><i class="fas fa-arrow-left"></i> Back to List</a>
+                </div>
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-4">Are you sure you want to delete this?</h2>
+                    <hr />
+                    <h4 class="mb-3">Product</h4>
+                    <dl class="row dl-horizontal">
+                        <dt class="col-sm-2">
+                            @Html.DisplayNameFor(model => model.ProductName)
+                        </dt>
+                        <dd class="col-sm-10">
+                            @Html.DisplayFor(model => model.ProductName)
+                        </dd>
+                        <dt class="col-sm-2">
+                            @Html.DisplayNameFor(model => model.Description)
+                        </dt>
+                        <dd class="col-sm-10">
+                            @Html.DisplayFor(model => model.Description)
+                        </dd>
+                        <dt class="col-sm-2">
+                            @Html.DisplayNameFor(model => model.Price)
+                        </dt>
+                        <dd class="col-sm-10">
+                            @Html.DisplayFor(model => model.Price)
+                        </dd>
+                        <dt class="col-sm-2">
+                            @Html.DisplayNameFor(model => model.StockQuantity)
+                        </dt>
+                        <dd class="col-sm-10">
+                            @Html.DisplayFor(model => model.StockQuantity)
+                        </dd>
+                        <dt class="col-sm-2">
+                            @Html.DisplayNameFor(model => model.ImageUrl)
+                        </dt>
+                        <dd class="col-sm-10">
+                            @Html.DisplayFor(model => model.ImageUrl)
+                        </dd>
+                        <dt class="col-sm-2">
+                            @Html.DisplayNameFor(model => model.CategoryId)
+                        </dt>
+                        <dd class="col-sm-10">
+                            @Html.DisplayFor(model => model.CategoryId)
+                        </dd>
+                        <dt class="col-sm-2">
+                            @Html.DisplayNameFor(model => model.VendorId)
+                        </dt>
+                        <dd class="col-sm-10">
+                            @Html.DisplayFor(model => model.VendorId)
+                        </dd>
+                        <dt class="col-sm-2">
+                            @Html.DisplayNameFor(model => model.CreatedDate)
+                        </dt>
+                        <dd class="col-sm-10">
+                            @Html.DisplayFor(model => model.CreatedDate)
+                        </dd>
+                        <dt class="col-sm-2">
+                            @Html.DisplayNameFor(model => model.UpdatedDate)
+                        </dt>
+                        <dd class="col-sm-10">
+                            @Html.DisplayFor(model => model.UpdatedDate)
+                        </dd>
+                    </dl>
+
+                    <form asp-action="DeleteProductApi" asp-controller="Product" asp-route-id="@Model.ProductId" method="post">
+                        <input type="hidden" asp-for="ProductId" />
+                        <div class="btn-container">
+                            <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Delete</button>
+                            <a class="btn btn-secondary" asp-action="Index"><i class="fas fa-times"></i> Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Libraries for Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

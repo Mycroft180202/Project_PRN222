@@ -39,65 +39,74 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"> <!-- Cập nhật Font Awesome 6 -->
+    <!-- Bootstrap 5 Stylesheet -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Bootstrap Stylesheet -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom Styles -->
+    <!-- Custom Styles (Đồng bộ với AdminDashboard.cshtml) -->
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f0f4f8;
-            color: #333;
+            background-color: #e8ecef; /* Màu sữa */
+            color: #333333; /* Đen */
             margin: 0;
             padding: 0;
         }
 
+        /* Main Container */
         .container-fluid {
             padding: 0;
             display: flex;
             height: 100vh;
         }
 
+        /* Sidebar */
         .sidebar {
             width: 250px;
-            background-color: #ffffff;
+            background-color: #ffffff; /* Trắng */
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
             padding: 20px 0;
             flex-shrink: 0;
         }
 
             .sidebar h4 {
-                color: #1a73e8;
+                color: #333333; /* Đen */
                 font-weight: 600;
                 padding: 0 20px 20px;
                 margin: 0;
-                border-bottom: 1px solid #e0e7ff;
+                border-bottom: 1px solid #e8ecef; /* Sữa */
             }
 
             .sidebar a {
-                color: #555;
+                color: #333333; /* Đen */
                 padding: 12px 20px;
-                display: block;
+                display: flex;
+                align-items: center;
                 text-decoration: none;
                 transition: all 0.3s ease;
                 cursor: pointer;
             }
 
-                .sidebar a:hover, .sidebar a.active {
-                    background-color: #e0e7ff;
-                    color: #1a73e8;
+                .sidebar a i {
+                    margin-right: 10px;
                 }
 
+                .sidebar a:hover,
+                .sidebar a.active {
+                    background-color: #e8ecef; /* Sữa */
+                    color: #333333; /* Đen */
+                }
+
+        /* Main Content */
         .content {
             flex-grow: 1;
             padding: 30px;
             overflow-y: auto;
+            background-color: #e8ecef; /* Sữa */
         }
 
             .content h2 {
-                color: #1a73e8;
+                color: #333333; /* Đen */
                 font-weight: 600;
                 margin-bottom: 30px;
                 text-align: center;
@@ -107,12 +116,18 @@
             border: none;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            background-color: #ffffff;
+            background-color: #ffffff; /* Trắng */
             margin-bottom: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
+            .card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            }
+
         .card-header {
-            background-color: #f8fbff;
+            background-color: #333333; /* Đen */
             border-bottom: none;
             padding: 15px 20px;
             border-radius: 10px 10px 0 0;
@@ -122,53 +137,66 @@
         }
 
             .card-header h3 {
-                color: #1a73e8;
+                color: #ffffff; /* Trắng */
                 font-weight: 500;
                 margin: 0;
             }
 
         .btn-primary {
-            background-color: #1a73e8;
-            border-color: #1a73e8;
+            background-color: #333333; /* Đen */
+            border-color: #333333;
             border-radius: 5px;
             padding: 8px 20px;
+            color: #ffffff; /* Trắng */
             transition: all 0.3s ease;
         }
 
             .btn-primary:hover {
-                background-color: #1557b0;
-                border-color: #1557b0;
+                background-color: #555555; /* Đen sáng hơn */
+                border-color: #555555;
             }
 
         .btn-warning {
-            background-color: #ffca28;
-            border-color: #ffca28;
-            color: #333;
+            background-color: #e8ecef; /* Sữa */
+            border-color: #e8ecef;
+            color: #333333; /* Đen */
             padding: 6px 12px;
+            transition: all 0.3s ease;
         }
+
+            .btn-warning:hover {
+                background-color: #d3d7dc; /* Sữa đậm hơn */
+                border-color: #d3d7dc;
+            }
 
         .btn-danger {
-            background-color: #ff5252;
-            border-color: #ff5252;
+            background-color: #ff4d4d; /* Đỏ để giữ sự nổi bật */
+            border-color: #ff4d4d;
             padding: 6px 12px;
+            transition: all 0.3s ease;
         }
 
+            .btn-danger:hover {
+                background-color: #e63946;
+                border-color: #e63946;
+            }
+
         .table {
-            background-color: #ffffff;
+            background-color: #ffffff; /* Trắng */
             border-radius: 0 0 10px 10px;
             margin-bottom: 0;
         }
 
             .table thead th {
-                background-color: #e0e7ff;
-                color: #1a73e8;
+                background-color: #e8ecef; /* Sữa */
+                color: #333333; /* Đen */
                 font-weight: 500;
                 border: none;
                 padding: 12px;
             }
 
             .table tbody tr:hover {
-                background-color: #f8fbff;
+                background-color: #f8f9fa; /* Sữa nhạt */
             }
 
             .table td {
@@ -176,26 +204,29 @@
                 padding: 12px;
             }
 
+        /* Modal */
         .modal-content {
             border-radius: 10px;
             border: none;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff; /* Trắng */
         }
 
         .modal-header {
-            background-color: #f8fbff;
+            background-color: #333333; /* Đen */
             border-bottom: none;
             border-radius: 10px 10px 0 0;
             padding: 15px 20px;
         }
 
         .modal-title {
-            color: #1a73e8;
+            color: #ffffff; /* Trắng */
             font-weight: 500;
         }
 
         .modal-body {
             padding: 20px;
+            background-color: #ffffff; /* Trắng */
         }
 
         .form-group {
@@ -204,20 +235,46 @@
 
         .form-control {
             border-radius: 5px;
-            border: 1px solid #e0e7ff;
+            border: 1px solid #e8ecef; /* Sữa */
             padding: 10px;
             width: 100%;
+            background-color: #fafafa; /* Sữa nhạt */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
             .form-control:focus {
-                border-color: #1a73e8;
-                box-shadow: 0 0 5px rgba(26, 115, 232, 0.3);
+                border-color: #333333; /* Đen */
+                box-shadow: 0 0 5px rgba(51, 51, 51, 0.3);
+                background-color: #ffffff; /* Trắng */
             }
 
         .modal-footer {
             padding: 15px 20px;
             border-top: none;
+            background-color: #ffffff; /* Trắng */
         }
+
+            .modal-footer .btn-secondary {
+                background-color: #e8ecef; /* Sữa */
+                border-color: #e8ecef;
+                color: #333333; /* Đen */
+            }
+
+                .modal-footer .btn-secondary:hover {
+                    background-color: #d3d7dc; /* Sữa đậm hơn */
+                    border-color: #d3d7dc;
+                }
+
+            .modal-footer .btn-primary {
+                background-color: #333333; /* Đen */
+                border-color: #333333;
+                color: #ffffff; /* Trắng */
+            }
+
+                .modal-footer .btn-primary:hover {
+                    background-color: #555555; /* Đen sáng hơn */
+                    border-color: #555555;
+                }
     </style>
 </head>
 
@@ -227,11 +284,11 @@
         <!-- Sidebar -->
         <div class="sidebar">
             <h4>Vendor Dashboard</h4>
-            <a class="nav-link active" data-tab="vendor-info">Vendor Information</a>
-            <a class="nav-link" data-tab="products">Product Management</a>
+            <a class="nav-link active" data-tab="vendor-info"><i class="fas fa-info-circle"></i> Vendor Information</a>
+            <a class="nav-link" data-tab="products"><i class="fas fa-box"></i> Product Management</a>
             <form asp-action="Logout" asp-controller="Auth" method="post" style="margin: 0;">
                 @Html.AntiForgeryToken()
-                <button type="submit" class="nav-link" style="border: none; background: none; width: 100%; text-align: left;">Logout</button>
+                <button type="submit" class="nav-link" style="border: none; background: none; width: 100%; text-align: left;margin-left:20px"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </form>
         </div>
 
@@ -246,7 +303,7 @@
                     <div class="card">
                         <div class="card-header">
                             <h3>Vendor Information</h3>
-                            <button class="btn btn-primary" data-toggle="modal" data-target="#editVendorModal">Edit</button>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editVendorModal">Edit</button>
                         </div>
                         <div class="card-body p-0">
                             <div class="table-responsive">
@@ -281,7 +338,6 @@
                     </div>
                 </div>
 
-                <!-- Product Management Tab -->
                 <!-- Product Management Tab -->
                 <div class="tab-pane fade" id="products">
                     <div class="card">
@@ -335,16 +391,17 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Edit Vendor Modal -->
-    <div class="modal fade" id="editVendorModal" tabindex="-1" role="dialog" aria-labelledby="editVendorModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+    <div class="modal fade" id="editVendorModal" tabindex="-1" aria-labelledby="editVendorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editVendorModalLabel">Edit Vendor Information</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="editVendorForm" asp-action="Update" asp-controller="Vendor" method="post">
@@ -386,7 +443,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Update</button>
                         </div>
                     </form>
@@ -396,16 +453,15 @@
     </div>
 
     <!-- Add Product Modal -->
-    <div class="modal fade" id="addProductModal" tabindex="-1" role="dialog" aria-labelledby="addProductModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+    <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="addProductModalLabel">Add New Product</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <!-- Backend Note: Form submission should be handled by ProductController's CreateProductApi action -->
                     <form id="addProductForm" asp-action="CreateProductApi" asp-controller="Product" method="post">
                         @Html.AntiForgeryToken()
                         <div class="row">
@@ -447,7 +503,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Save Product</button>
                         </div>
                     </form>
@@ -457,8 +513,8 @@
     </div>
 
     <!-- JavaScript Libraries for Bootstrap -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).ready(function () {
             $('.nav-link').on('click', function () {

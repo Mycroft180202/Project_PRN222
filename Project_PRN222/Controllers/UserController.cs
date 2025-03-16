@@ -20,8 +20,8 @@ namespace Project_PRN222.Controllers
         }
 
         // Action to return User Profile View (for logged in user)
-        [HttpGet("Profile")]
-        [RoleAuthorize(1, 2, 3)]
+        [HttpGet("User/Profile")]
+        //[RoleAuthorize(1, 2, 3)]
         public async Task<IActionResult> ProfileView()
         {
             var userId = int.Parse(HttpContext.Session.GetString("UserId") ?? "0");

@@ -69,15 +69,15 @@ namespace Project_PRN222.Controllers
         }
 
         // Action to return Create Product View (Admin, Vendor)
-        [HttpGet("CreateView")]
-        [RoleAuthorize(1, 2)]
+        [HttpGet("Product/CreateView")]
+        //[RoleAuthorize(1, 2)]
         public IActionResult Create()
         {
-            return View("Create"); // Assuming you have a Create.cshtml in Views/Product for creating products
+            return View("CreateView"); // Assuming you have a Create.cshtml in Views/Product for creating products
         }
 
         [HttpPost("api/products")]
-        [RoleAuthorize(1, 2)]
+        //[RoleAuthorize(1, 2)]
         public IActionResult CreateProductApi([FromBody] Product product)
         {
             if (product == null)
@@ -119,7 +119,7 @@ namespace Project_PRN222.Controllers
 
         // Action to return Edit Product View (Admin, Vendor)
         [HttpGet("EditView/{id}")]
-        [RoleAuthorize(1, 2)]
+        //[RoleAuthorize(1, 2)]
         public IActionResult EditView(int id)
         {
             var product = _productService.GetProductById(id);
@@ -133,7 +133,7 @@ namespace Project_PRN222.Controllers
 
         // Chỉ Admin và Vendor (nếu sở hữu sản phẩm) được sửa
         [HttpPut("api/products/{id}")]
-        [RoleAuthorize(1, 2)]
+        //[RoleAuthorize(1, 2)]
         public IActionResult UpdateProductApi(int id, [FromBody] Product product)
         {
             if (id != product.ProductId)
@@ -155,7 +155,7 @@ namespace Project_PRN222.Controllers
 
         // Action to return Delete Product Confirmation View (Admin, Vendor) - Optional
         [HttpGet("DeleteConfirmationView/{id}")]
-        [RoleAuthorize(1, 2)]
+        //[RoleAuthorize(1, 2)]
         public IActionResult DeleteConfirmationView(int id)
         {
             var product = _productService.GetProductById(id);
@@ -169,7 +169,7 @@ namespace Project_PRN222.Controllers
 
         // Chỉ Admin và Vendor (nếu sở hữu sản phẩm) được xóa
         [HttpDelete("api/products/{id}")]
-        [RoleAuthorize(1, 2)]
+        //[RoleAuthorize(1, 2)]
         public IActionResult DeleteProductApi(int id)
         {
             var product = _productService.GetProductById(id);
