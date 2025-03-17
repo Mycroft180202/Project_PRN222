@@ -19,7 +19,21 @@ namespace Project_PRN222.Controllers
         public IActionResult Index()
         {
             var products = _productService.GetAllProducts();
-            return View(products); // Assuming you have an Index.cshtml in Views/Product to display products
+            return View(products);
+        }
+
+        // Hiển thị chi tiết sản phẩm
+        [HttpGet("Detail/{id}")]
+        public IActionResult Detail(int id)
+        {
+            var product = _productService.GetProductById(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+            // Bỏ phần gọi GetRelatedProducts để tránh lỗi
+            ViewBag.RelatedProducts = new List<Product>(); // Truyền danh sách rỗng để tránh lỗi trong view
+            return View(product);
         }
 
         [HttpGet("api/products")]
@@ -70,14 +84,12 @@ namespace Project_PRN222.Controllers
 
         // Action to return Create Product View (Admin, Vendor)
         [HttpGet("Product/CreateView")]
-        //[RoleAuthorize(1, 2)]
         public IActionResult Create()
         {
-            return View("CreateView"); // Assuming you have a Create.cshtml in Views/Product for creating products
+            return View("CreateView");
         }
 
         [HttpPost("api/products")]
-        //[RoleAuthorize(1, 2)]
         public IActionResult CreateProductApi([FromBody] Product product)
         {
             if (product == null)
@@ -119,7 +131,6 @@ namespace Project_PRN222.Controllers
 
         // Action to return Edit Product View (Admin, Vendor)
         [HttpGet("EditView/{id}")]
-        //[RoleAuthorize(1, 2)]
         public IActionResult EditView(int id)
         {
             var product = _productService.GetProductById(id);
@@ -127,13 +138,11 @@ namespace Project_PRN222.Controllers
             {
                 return NotFound();
             }
-            return View("Edit", product); // Assuming you have an Edit.cshtml in Views/Product for editing products, passing the product model
+            return View("Edit", product);
         }
-
 
         // Chỉ Admin và Vendor (nếu sở hữu sản phẩm) được sửa
         [HttpPut("api/products/{id}")]
-        //[RoleAuthorize(1, 2)]
         public IActionResult UpdateProductApi(int id, [FromBody] Product product)
         {
             if (id != product.ProductId)
@@ -155,7 +164,6 @@ namespace Project_PRN222.Controllers
 
         // Action to return Delete Product Confirmation View (Admin, Vendor) - Optional
         [HttpGet("DeleteConfirmationView/{id}")]
-        //[RoleAuthorize(1, 2)]
         public IActionResult DeleteConfirmationView(int id)
         {
             var product = _productService.GetProductById(id);
@@ -163,13 +171,11 @@ namespace Project_PRN222.Controllers
             {
                 return NotFound();
             }
-            return View("DeleteConfirmation", product); // Assuming you have a DeleteConfirmation.cshtml in Views/Product
+            return View("DeleteConfirmation", product);
         }
-
 
         // Chỉ Admin và Vendor (nếu sở hữu sản phẩm) được xóa
         [HttpDelete("api/products/{id}")]
-        //[RoleAuthorize(1, 2)]
         public IActionResult DeleteProductApi(int id)
         {
             var product = _productService.GetProductById(id);
