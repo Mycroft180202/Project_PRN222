@@ -17,8 +17,8 @@ namespace Project_PRN222.Controllers
         }
 
         // Action to return Checkout View
-        [HttpGet("checkout")]
-        [RoleAuthorize(1, 2, 3)]
+        [HttpGet("Order/Checkout")]
+        //[RoleAuthorize(1, 2, 3)]
         public IActionResult Checkout()
         {
             return View("Checkout"); // Assuming you have a Checkout.cshtml in Views/Order

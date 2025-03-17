@@ -3,7 +3,6 @@
 @{
     ViewData["Title"] = "Register - EShopper";
     Layout = null; // Tắt layout mặc định của project
-
 }
 
 @if (TempData["Error"] != null)
@@ -55,8 +54,25 @@
                             <a href="@Url.Action("Contact", "Home")" class="nav-item nav-link">Contact</a>
                         </div>
                         <div class="navbar-nav ml-auto py-0">
-                            <a href="@Url.Action("login", "Auth")" class="nav-item nav-link">Login</a>
-                            <a href="@Url.Action("register", "Auth")" class="nav-item nav-link active">Register</a>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <div class="nav-item dropdown">
+                                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                                        Welcome, @User.Identity.Name
+                                    </a>
+                                    <div class="dropdown-menu rounded-0 m-0">
+                                        <form asp-action="Logout" asp-controller="Auth" method="post" style="margin: 0;">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="dropdown-item">Logout</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <a href="@Url.Action("Login", "Auth")" class="nav-item nav-link">Login</a>
+                                <a href="@Url.Action("Register", "Auth")" class="nav-item nav-link active">Register</a>
+                            }
                         </div>
                     </div>
                 </nav>
@@ -112,7 +128,7 @@
                             </div>
                             <button type="submit" class="btn btn-primary btn-block py-2">Register</button>
                             <div class="text-center mt-3">
-                                <p>Already have an account? <a href="@Url.Action("login", "Auth")" class="text-primary">Login here</a></p>
+                                <p>Already have an account? <a href="@Url.Action("Login", "Auth")" class="text-primary">Login here</a></p>
                             </div>
                             @Html.AntiForgeryToken()
                         </form>

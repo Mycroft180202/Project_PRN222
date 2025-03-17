@@ -15,8 +15,8 @@ namespace Project_PRN222.Controllers
             _cartService = cartService;
         }
 
-        [HttpGet("cart")]
-        [RoleAuthorize(1, 2, 3)]
+        [HttpGet("/Cart/Cart")]
+        //[RoleAuthorize(1, 2, 3)]
         public async Task<IActionResult> Cart()
         {
             var cartItems = await _cartService.GetCartItems();

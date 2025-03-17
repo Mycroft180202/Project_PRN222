@@ -3,6 +3,24 @@
 @{
     ViewData["Title"] = "Profile - EShopper";
     Layout = null; // Disable default layout
+
+    // Giả lập dữ liệu (mock data) để hiển thị giao diện mà không cần backend
+    var mockUser = new Project_PRN222.Models.User
+            {
+                UserId = 1,
+                UserName = "johndoe",
+                Email = "john@example.com",
+                FirstName = "John",
+                LastName = "Doe",
+                PhoneNumber = "+123456789",
+                Address = "123 Main St",
+                RegistrationDate = DateTime.Now,
+                IsActive = true,
+                RoleId = 3
+            };
+
+    // Sử dụng mockUser để hiển thị giao diện, bỏ qua Model từ backend
+    var user = mockUser;
 }
 
 <!DOCTYPE html>
@@ -208,63 +226,52 @@
                 <div class="card-body p-4">
                     <form id="profileForm">
                         @Html.AntiForgeryToken()
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                         <div class="form-group">
-                            <label asp-for="UserId" class="form-label"><i class="fas fa-id-badge"></i> User ID</label>
-                            <input asp-for="UserId" class="form-control" readonly />
-                            <span asp-validation-for="UserId" class="text-danger"></span>
+                            <label class="form-label"><i class="fas fa-id-badge"></i> User ID</label>
+                            <input class="form-control" readonly value="@user.UserId" />
                         </div>
                         <div class="form-group">
-                            <label asp-for="UserName" class="form-label"><i class="fas fa-user-tag"></i> Username</label>
-                            <input asp-for="UserName" class="form-control" readonly />
-                            <span asp-validation-for="UserName" class="text-danger"></span>
+                            <label class="form-label"><i class="fas fa-user-tag"></i> Username</label>
+                            <input class="form-control" readonly value="@user.UserName" />
                         </div>
                         <div class="form-group">
-                            <label asp-for="Email" class="form-label"><i class="fas fa-envelope"></i> Email</label>
-                            <input asp-for="Email" class="form-control" id="email" placeholder="Enter email" required />
-                            <span asp-validation-for="Email" class="text-danger"></span>
+                            <label class="form-label"><i class="fas fa-envelope"></i> Email</label>
+                            <input class="form-control" id="email" value="@user.Email" placeholder="Enter email" required />
                         </div>
                         <div class="form-group">
-                            <label asp-for="FirstName" class="form-label"><i class="fas fa-user"></i> First Name</label>
-                            <input asp-for="FirstName" class="form-control" id="firstName" placeholder="Enter first name" required />
-                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                            <label class="form-label"><i class="fas fa-user"></i> First Name</label>
+                            <input class="form-control" id="firstName" value="@user.FirstName" placeholder="Enter first name" required />
                         </div>
                         <div class="form-group">
-                            <label asp-for="LastName" class="form-label"><i class="fas fa-user"></i> Last Name</label>
-                            <input asp-for="LastName" class="form-control" id="lastName" placeholder="Enter last name" required />
-                            <span asp-validation-for="LastName" class="text-danger"></span>
+                            <label class="form-label"><i class="fas fa-user"></i> Last Name</label>
+                            <input class="form-control" id="lastName" value="@user.LastName" placeholder="Enter last name" required />
                         </div>
                         <div class="form-group">
-                            <label asp-for="PhoneNumber" class="form-label"><i class="fas fa-phone"></i> Phone Number</label>
-                            <input asp-for="PhoneNumber" class="form-control" id="phoneNumber" placeholder="Enter phone number" required />
-                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                            <label class="form-label"><i class="fas fa-phone"></i> Phone Number</label>
+                            <input class="form-control" id="phoneNumber" value="@user.PhoneNumber" placeholder="Enter phone number" required />
                         </div>
                         <div class="form-group">
-                            <label asp-for="Address" class="form-label"><i class="fas fa-map-marker-alt"></i> Address</label>
-                            <input asp-for="Address" class="form-control" id="address" placeholder="Enter address" required />
-                            <span asp-validation-for="Address" class="text-danger"></span>
+                            <label class="form-label"><i class="fas fa-map-marker-alt"></i> Address</label>
+                            <input class="form-control" id="address" value="@user.Address" placeholder="Enter address" required />
                         </div>
                         <div class="form-group">
-                            <label asp-for="RegistrationDate" class="form-label"><i class="fas fa-calendar-alt"></i> Registration Date</label>
-                            <input asp-for="RegistrationDate" class="form-control" readonly />
-                            <span asp-validation-for="RegistrationDate" class="text-danger"></span>
+                            <label class="form-label"><i class="fas fa-calendar-alt"></i> Registration Date</label>
+                            <input class="form-control" readonly value="@user.RegistrationDate?.ToString("yyyy-MM-dd")" />
                         </div>
                         <div class="form-group">
-                            <label asp-for="IsActive" class="form-label"><i class="fas fa-toggle-on"></i> Active</label>
-                            <select asp-for="IsActive" class="form-control" disabled>
-                                <option value="true" selected="@(Model.IsActive == true ? "selected" : "")">Yes</option>
-                                <option value="false" selected="@(Model.IsActive == false ? "selected" : "")">No</option>
+                            <label class="form-label"><i class="fas fa-toggle-on"></i> Active</label>
+                            <select class="form-control" disabled>
+                                <option value="true" selected="@(user.IsActive == true ? "selected" : "")">Yes</option>
+                                <option value="false" selected="@(user.IsActive == false ? "selected" : "")">No</option>
                             </select>
-                            <span asp-validation-for="IsActive" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label asp-for="RoleId" class="form-label"><i class="fas fa-user-shield"></i> Role</label>
-                            <select asp-for="RoleId" class="form-control" disabled>
-                                <option value="1" selected="@(Model.RoleId == 1 ? "selected" : "")">Admin</option>
-                                <option value="2" selected="@(Model.RoleId == 2 ? "selected" : "")">Vendor</option>
-                                <option value="3" selected="@(Model.RoleId == 3 ? "selected" : "")">User</option>
+                            <label class="form-label"><i class="fas fa-user-shield"></i> Role</label>
+                            <select class="form-control" disabled>
+                                <option value="1" selected="@(user.RoleId == 1 ? "selected" : "")">Admin</option>
+                                <option value="2" selected="@(user.RoleId == 2 ? "selected" : "")">Vendor</option>
+                                <option value="3" selected="@(user.RoleId == 3 ? "selected" : "")">User</option>
                             </select>
-                            <span asp-validation-for="RoleId" class="text-danger"></span>
                         </div>
                         <div class="btn-container">
                             <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
@@ -279,53 +286,19 @@
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
-    <!-- SweetAlert2 for modern alerts -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function () {
             $('#profileForm').on('submit', function (e) {
                 e.preventDefault();
-                var formData = {
-                    Email: $('#email').val(),
-                    FirstName: $('#firstName').val(),
-                    LastName: $('#lastName').val(),
-                    PhoneNumber: $('#phoneNumber').val(),
-                    Address: $('#address').val()
-                };
-
-                $.ajax({
-                    url: '/api/user/me',
-                    type: 'PUT',
-                    contentType: 'application/json',
-                    data: JSON.stringify(formData),
-                    headers: {
-                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
-                    },
-                    success: function (response) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success!',
-                            text: 'Profile updated successfully!',
-                            confirmButtonText: 'OK',
-                            customClass: {
-                                confirmButton: 'btn btn-primary'
-                            }
-                        }).then(() => {
-                            window.location.href = '@Url.Action("Index", "Home")';
-                        });
-                    },
-                    error: function (xhr) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Error updating profile: ' + xhr.responseText,
-                            confirmButtonText: 'OK',
-                            customClass: {
-                                confirmButton: 'btn btn-danger'
-                            }
-                        });
+                // Hiển thị thông báo giả lập vì không gọi backend
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Profile updated successfully (mock response)!',
+                    confirmButtonText: 'OK',
+                    customClass: {
+                        confirmButton: 'btn btn-primary'
                     }
                 });
             });

@@ -30,6 +30,19 @@
 
     <!-- Customized Stylesheet -->
     <link href="~/css/style.css" rel="stylesheet">
+
+    <!-- Custom CSS for navbar hover and active states -->
+    <style>
+        .navbar-light .navbar-nav .nav-link:hover,
+        .navbar-light .navbar-nav .nav-link.active {
+            color: #D19C97;
+        }
+
+        .navbar-light .navbar-nav .dropdown-menu .dropdown-item:hover,
+        .navbar-light .navbar-nav .dropdown-menu .dropdown-item.active {
+            color: #D19C97;
+        }
+    </style>
 </head>
 
 <body>
@@ -38,11 +51,11 @@
         <div class="row bg-secondary py-2 px-xl-5">
             <div class="col-lg-6 d-none d-lg-block">
                 <div class="d-inline-flex align-items-center">
-                    <a class="text-dark" href="#">FAQs</a>
+                    <a class="text-dark" href="@Url.Action("Index", "Home")#faq">FAQs</a>
                     <span class="text-muted px-2">|</span>
-                    <a class="text-dark" href="#">Help</a>
+                    <a class="text-dark" href="@Url.Action("Contact", "Home")">Help</a>
                     <span class="text-muted px-2">|</span>
-                    <a class="text-dark" href="#">Support</a>
+                    <a class="text-dark" href="@Url.Action("Contact", "Home")">Support</a>
                 </div>
             </div>
             <div class="col-lg-6 text-center text-lg-right">
@@ -105,33 +118,33 @@
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link" data-toggle="dropdown">Bat Trang Ceramics <i class="fa fa-angle-down float-right mt-1"></i></a>
                             <div class="dropdown-menu position-absolute bg-secondary border-0 rounded-0 w-100 m-0">
-                                <a href="#" class="dropdown-item">Decorative Ceramics</a>
-                                <a href="#" class="dropdown-item">Household Ceramics</a>
-                                <a href="#" class="dropdown-item">Artistic Ceramics</a>
+                                <a href="@Url.Action("Shop", "Home", new { category = "ceramics" })" class="dropdown-item">Decorative Ceramics</a>
+                                <a href="@Url.Action("Shop", "Home", new { category = "ceramics" })" class="dropdown-item">Household Ceramics</a>
+                                <a href="@Url.Action("Shop", "Home", new { category = "ceramics" })" class="dropdown-item">Artistic Ceramics</a>
                             </div>
                         </div>
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link" data-toggle="dropdown">Silk <i class="fa fa-angle-down float-right mt-1"></i></a>
                             <div class="dropdown-menu position-absolute bg-secondary border-0 rounded-0 w-100 m-0">
-                                <a href="#" class="dropdown-item">Silk Clothing</a>
-                                <a href="#" class="dropdown-item">Silk Scarves</a>
-                                <a href="#" class="dropdown-item">Silk Accessories</a>
+                                <a href="@Url.Action("Shop", "Home", new { category = "silk" })" class="dropdown-item">Silk Clothing</a>
+                                <a href="@Url.Action("Shop", "Home", new { category = "silk" })" class="dropdown-item">Silk Scarves</a>
+                                <a href="@Url.Action("Shop", "Home", new { category = "silk" })" class="dropdown-item">Silk Accessories</a>
                             </div>
                         </div>
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link" data-toggle="dropdown">Bamboo & Rattan Weaving <i class="fa fa-angle-down float-right mt-1"></i></a>
                             <div class="dropdown-menu position-absolute bg-secondary border-0 rounded-0 w-100 m-0">
-                                <a href="#" class="dropdown-item">Baskets</a>
-                                <a href="#" class="dropdown-item">Furniture</a>
-                                <a href="#" class="dropdown-item">Decorative Items</a>
+                                <a href="@Url.Action("Shop", "Home", new { category = "bamboo" })" class="dropdown-item">Baskets</a>
+                                <a href="@Url.Action("Shop", "Home", new { category = "bamboo" })" class="dropdown-item">Furniture</a>
+                                <a href="@Url.Action("Shop", "Home", new { category = "bamboo" })" class="dropdown-item">Decorative Items</a>
                             </div>
                         </div>
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link" data-toggle="dropdown">Conical Hats <i class="fa fa-angle-down float-right mt-1"></i></a>
                             <div class="dropdown-menu position-absolute bg-secondary border-0 rounded-0 w-100 m-0">
-                                <a href="#" class="dropdown-item">Traditional Conical Hats</a>
-                                <a href="#" class="dropdown-item">Decorated Conical Hats</a>
-                                <a href="#" class="dropdown-item">Modern Conical Hats</a>
+                                <a href="@Url.Action("Shop", "Home", new { category = "conical" })" class="dropdown-item">Traditional Conical Hats</a>
+                                <a href="@Url.Action("Shop", "Home", new { category = "conical" })" class="dropdown-item">Decorated Conical Hats</a>
+                                <a href="@Url.Action("Shop", "Home", new { category = "conical" })" class="dropdown-item">Modern Conical Hats</a>
                             </div>
                         </div>
                     </div>
@@ -148,15 +161,16 @@
                     <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
                         <div class="navbar-nav mr-auto py-0">
                             <a href="@Url.Action("Index", "Home")" class="nav-item nav-link active">Home</a>
-                            <a href="@Url.Action("Shop", "Home")" class="nav-item nav-link">Shop</a>
+                            <a href="/Product/Index" class="nav-item nav-link">Shop</a>
                             <a href="@Url.Action("Detail", "Home")" class="nav-item nav-link">Shop Detail</a>
                             <div class="nav-item dropdown">
                                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages</a>
                                 <div class="dropdown-menu rounded-0 m-0">
-                                    <a href="/api/cart/cart" class="dropdown-item">Shopping Cart</a>
-                                    <a href="@Url.Action("Checkout", "Home")" class="dropdown-item">Checkout</a>
+                                    <a href="/Cart/Cart" class="dropdown-item">Shopping Cart</a>
+                                    <a href="/Order/Checkout" class="dropdown-item">Checkout</a>
                                 </div>
                             </div>
+                            <a href="@Url.Action("Privacy", "Home")" class="nav-item nav-link">Privacy</a>
                             <a href="@Url.Action("Contact", "Home")" class="nav-item nav-link">Contact</a>
                         </div>
                         <div class="navbar-nav ml-auto py-0">
@@ -167,6 +181,18 @@
                                         Welcome, @User.Identity.Name
                                     </a>
                                     <div class="dropdown-menu rounded-0 m-0">
+                                        <!-- Kiểm tra RoleId từ Claims -->
+                                        @{
+                                            var roleId = User.Claims.FirstOrDefault(c => c.Type == "RoleId")?.Value;
+                                            if (roleId == "1") // ADMIN
+                                            {
+                                                <a href="@Url.Action("Index", "Admin")" class="dropdown-item">Admin Dashboard</a>
+                                            }
+                                            else if (roleId == "2") // VENDOR
+                                            {
+                                                <a href="@Url.Action("Index", "Vendor")" class="dropdown-item">Vendor Dashboard</a>
+                                            }
+                                        }
                                         <form asp-action="Logout" asp-controller="Auth" method="post" style="margin: 0;">
                                             @Html.AntiForgeryToken()
                                             <button type="submit" class="dropdown-item">Logout</button>
@@ -600,7 +626,7 @@
     @section Scripts {
         <script>
             // Tạm thời bỏ qua SignalR để tránh lỗi
-            /*const connection = new signalR.HubConnectionBuilder()
+            const connection = new signalR.HubConnectionBuilder()
                 .withUrl("/notificationHub")
                 .build();
 
@@ -624,7 +650,7 @@
 
             connection.start().catch(function (err) {
                 console.error(err.toString());
-            });*/
+            });
         </script>
     }
 </body>

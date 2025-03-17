@@ -11,7 +11,7 @@
         new Project_PRN222.DTO.CartItemDto { ProductId = 2, ProductName = "Elegant Silk Scarf", Quantity = 1, Price = 45000M, AddedDate = DateTime.Now }
     };
 
-    // Sử dụng mock data nếu Model là null hoặc rỗng (do lỗi SQL)
+    // Sử dụng mock data nếu Model là null hoặc rỗng
     var cartItems = Model?.Any() == true ? Model : (IEnumerable<Project_PRN222.DTO.CartItemDto>)mockCartItems;
     var subtotal = cartItems.Sum(item => item.Quantity * item.Price);
     var shippingCost = 30000M; // Giá vận chuyển mặc định
@@ -28,7 +28,7 @@
     <meta content="Shop Vietnamese handmade handicrafts" name="description">
 
     <!-- Favicon -->
-    <link href="~/img/favicon.ico" rel="icon">
+    <link href="./img/favicon.ico" rel="icon">
 
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -38,11 +38,11 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
 
     <!-- Libraries Stylesheet -->
-    <link href="~/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="./lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
-    <link href="~/css/style.css" rel="stylesheet">
+    <link href="./css/style.css" rel="stylesheet">
 
     <style>
         /* Customize checkout layout like Shopee/Lazada */
@@ -62,6 +62,7 @@
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
+
         /* Fix topbar layout to avoid line breaks */
         .topbar-logo {
             font-size: 2rem;
@@ -226,6 +227,11 @@
                                 <h6 class="font-weight-medium">Shipping Address</h6>
                                 <textarea class="form-control" name="shippingAddress" rows="3" placeholder="Enter your shipping address" required>[ShippingAddress]</textarea>
                             </div>
+                            <!-- Billing Address (giả định bằng shippingAddress nếu không có input riêng) -->
+                            <!-- <div class="mb-3">
+                                <h6 class="font-weight-medium">Billing Address</h6>
+                                <textarea class="form-control" name="billingAddress" rows="3" placeholder="Enter your billing address" required>[BillingAddress]</textarea>
+                            </div> -->
                             <!-- Phone Number -->
                             <div class="mb-3">
                                 <h6 class="font-weight-medium">Phone Number</h6>
@@ -300,13 +306,18 @@
                             <h5 class="font-weight-bold">Total</h5>
                             <h5 class="font-weight-bold">@totalAmount VND</h5>
                         </div>
-                        <form asp-action="Checkout" asp-controller="Order" method="post">
-                            <input type="hidden" name="userId" value="1" /> <!-- Giá trị tĩnh, backend sẽ thay thế -->
-                            <input type="hidden" name="shippingAddress" value="" />
-                            <input type="hidden" name="phoneNumber" value="" />
-                            <input type="hidden" name="shipmentMethodId" value="" />
-                            <input type="hidden" name="paymentMethod" value="" />
+                        <!-- Form để tương thích với [HttpPost("checkout")] và CheckoutRequest -->
+                        <form asp-action="checkout" asp-controller="Order" method="post" id="checkoutForm">
+                            <input type="hidden" name="shippingAddress" id="hiddenShippingAddress" />
+                            <input type="hidden" name="billingAddress" id="hiddenBillingAddress" value="" /> <!-- Giả định bằng shippingAddress -->
+                            <input type="hidden" name="shipmentMethodId" id="hiddenShipmentMethodId" />
+                            <input type="hidden" name="paymentMethod" id="hiddenPaymentMethod" />
+                            <!-- Comment logic submit để demo, dev backend sẽ tích hợp -->
+                            @* 
                             <button type="submit" class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3">Place Order</button>
+                            *@
+                            <!-- Thay bằng nút giả lập để demo -->
+                            <button type="button" class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3" onclick="placeOrderDemo()">Place Order (Demo)</button>
                         </form>
                     </div>
                 </div>
@@ -375,7 +386,7 @@
                 </p>
             </div>
             <div class="col-md-6 px-xl-0 text-center text-md-right">
-                <img class="img-fluid" src="~/img/payments.png" alt="">
+                <img class="img-fluid" src="./img/payments.png" alt="">
             </div>
         </div>
     </div>
@@ -386,37 +397,54 @@
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
-    <script src="~/lib/easing/easing.min.js"></script>
-    <script src="~/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="./lib/easing/easing.min.js"></script>
+    <script src="./lib/owlcarousel/owl.carousel.min.js"></script>
 
     <!-- Contact Javascript File -->
-    <script src="~/mail/jqBootstrapValidation.min.js"></script>
-    <script src="~/mail/contact.js"></script>
+    <script src="./mail/jqBootstrapValidation.min.js"></script>
+    <script src="./mail/contact.js"></script>
 
     <!-- Template Javascript -->
-    <script src="~/js/main.js"></script>
+    <script src="./js/main.js"></script>
 
-    <!-- Custom Script to Sync Form Data -->
+    <!-- Custom Script to Sync Form Data (Demo Mode) -->
     <script>
         $(document).ready(function () {
-            $('form').on('submit', function (e) {
-                e.preventDefault(); // Ngăn gửi form thực sự để demo
-                // Sync input values to hidden fields
-                $('input[name="shippingAddress"]').val($('textarea[name="shippingAddress"]').val());
-                $('input[name="phoneNumber"]').val($('input[name="phoneNumber"]').val());
-                $('input[name="shipmentMethodId"]').val($('select[name="shipmentMethodId"]').val());
-                $('input[name="paymentMethod"]').val($('input[name="paymentMethod"]:checked').val());
+            // Ngăn gửi form thực sự để demo
+            $('#checkoutForm').on('submit', function (e) {
+                e.preventDefault();
+                // Đồng bộ dữ liệu từ input vào hidden fields
+                $('#hiddenShippingAddress').val($('textarea[name="shippingAddress"]').val());
+                $('#hiddenBillingAddress').val($('textarea[name="shippingAddress"]').val()); // Giả định billingAddress = shippingAddress
+                $('#hiddenShipmentMethodId').val($('select[name="shipmentMethodId"]').val());
+                $('#hiddenPaymentMethod').val($('input[name="paymentMethod"]:checked').val());
 
                 // Giả lập phản hồi thành công cho demo
                 alert('Order placed successfully! (Demo Mode)');
-                console.log('Form data:', {
-                    userId: $('input[name="userId"]').val(),
-                    shippingAddress: $('input[name="shippingAddress"]').val(),
-                    phoneNumber: $('input[name="phoneNumber"]').val(),
-                    shipmentMethodId: $('input[name="shipmentMethodId"]').val(),
-                    paymentMethod: $('input[name="paymentMethod"]').val()
+                console.log('Form data (for backend mapping to CheckoutRequest):', {
+                    shippingAddress: $('#hiddenShippingAddress').val(),
+                    billingAddress: $('#hiddenBillingAddress').val(),
+                    shipmentMethodId: $('#hiddenShipmentMethodId').val(),
+                    paymentMethod: $('#hiddenPaymentMethod').val()
                 });
             });
+
+            // Hàm demo cho nút Place Order
+            function placeOrderDemo() {
+                // Đồng bộ dữ liệu từ input vào hidden fields
+                $('#hiddenShippingAddress').val($('textarea[name="shippingAddress"]').val());
+                $('#hiddenBillingAddress').val($('textarea[name="shippingAddress"]').val()); // Giả định billingAddress = shippingAddress
+                $('#hiddenShipmentMethodId').val($('select[name="shipmentMethodId"]').val());
+                $('#hiddenPaymentMethod').val($('input[name="paymentMethod"]:checked').val());
+
+                alert('Order placed successfully! (Demo Mode)');
+                console.log('Form data (for backend mapping to CheckoutRequest):', {
+                    shippingAddress: $('#hiddenShippingAddress').val(),
+                    billingAddress: $('#hiddenBillingAddress').val(),
+                    shipmentMethodId: $('#hiddenShipmentMethodId').val(),
+                    paymentMethod: $('#hiddenPaymentMethod').val()
+                });
+            }
         });
     </script>
 </body>
