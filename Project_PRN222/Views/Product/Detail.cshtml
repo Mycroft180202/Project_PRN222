@@ -1,5 +1,4 @@
 ﻿@model IEnumerable<Project_PRN222.Models.Product>
-
 @{
     ViewData["Title"] = "Products - EShopper";
     Layout = null; // Tắt layout mặc định
@@ -88,9 +87,9 @@
                 </form>
             </div>
             <div class="col-lg-3 col-6 text-right">
-                <a href="/api/cart/cart" class="btn border" id="cartButton">
+                <a href="/api/cart/cart" class="btn border">
                     <i class="fas fa-shopping-cart text-primary"></i>
-                    <span class="badge" id="cartBadge">0</span>
+                    <span class="badge">0</span>
                 </a>
             </div>
         </div>
@@ -208,28 +207,28 @@
             <h2 class="section-title px-5"><span class="px-2">Our Products</span></h2>
         </div>
         <div class="row px-xl-5">
-            @foreach (var product in Model.Take(4)) // Giới hạn hiển thị 4 sản phẩm
-            {
-                <div class="col-lg-3 col-md-6 col-sm-12 pb-1">
-                    <div class="card product-item border-0 mb-4">
-                        <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
-                            <img class="img-fluid w-100" src="@product.ImageUrl" alt="@product.ProductName">
-                        </div>
-                        <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
-                            <h6 class="text-truncate mb-3">@product.ProductName</h6>
-                            <div class="d-flex justify-content-center">
-                                <h6>$@product.Price</h6>
+            <div class="col">
+                <div class="owl-carousel related-carousel">
+                    @foreach (var product in Model)
+                    {
+                        <div class="card product-item border-0">
+                            <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+                                <img class="img-fluid w-100" src="@product.ImageUrl" alt="@product.ProductName">
+                            </div>
+                            <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
+                                <h6 class="text-truncate mb-3">@product.ProductName</h6>
+                                <div class="d-flex justify-content-center">
+                                    <h6>$@product.Price</h6>
+                                </div>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between bg-light border">
+                                <a href="@Url.Action("Detail", "Product", new { id = product.ProductId })" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a>
+                                <a href="" class="btn btn-sm text-dark p-0"><i class="fas fa-shopping-cart text-primary mr-1"></i>Add To Cart</a>
                             </div>
                         </div>
-                        <div class="card-footer d-flex justify-content-between bg-light border">
-                            <a href="@Url.Action("Detail", "Product", new { id = product.ProductId })" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a>
-                            <a href="#" class="btn btn-sm text-dark p-0 add-to-cart" data-product-id="@product.ProductId" data-product-name="@product.ProductName" data-price="@product.Price">
-                                <i class="fas fa-shopping-cart text-primary mr-1"></i>Add To Cart
-                            </a>
-                        </div>
-                    </div>
+                    }
                 </div>
-            }
+            </div>
         </div>
     </div>
     <!-- Products End -->
@@ -314,45 +313,5 @@
 
     <!-- Template Javascript -->
     <script src="~/js/main.js"></script>
-
-    <!-- Custom JavaScript for Add to Cart -->
-    <script>
-        $(document).ready(function () {
-            $('.add-to-cart').click(function (e) {
-                e.preventDefault();
-                var productId = $(this).data('product-id');
-                var productName = $(this).data('product-name');
-                var price = $(this).data('price');
-
-                $.ajax({
-                    url: '/api/cart/add',
-                    type: 'POST',
-                    data: {
-                        productId: productId,
-                        quantity: 1
-                    },
-                    success: function (response) {
-                        alert(response.Message || 'Product added to cart successfully!');
-                        updateCartBadge(); // Cập nhật số lượng trên biểu tượng giỏ hàng
-                    },
-                    error: function (xhr) {
-                        alert('Error adding product: ' + (xhr.responseJSON?.Message || 'Unknown error'));
-                    }
-                });
-            });
-
-            function updateCartBadge() {
-                $.get('/api/cart/cart', function (data) {
-                    var itemCount = data.length || 0;
-                    $('#cartBadge').text(itemCount);
-                }).fail(function () {
-                    $('#cartBadge').text('0');
-                });
-            }
-
-            // Cập nhật số lượng ban đầu khi tải trang
-            updateCartBadge();
-        });
-    </script>
 </body>
 </html>

@@ -139,7 +139,7 @@
             <div class="col-lg-3 col-6 text-right">
                 <a href="/api/cart/cart" class="btn border">
                     <i class="fas fa-shopping-cart text-primary"></i>
-                    <span class="badge">@Model?.Count</span>
+                    <span class="badge">@(Model?.Count ?? 0)</span>
                 </a>
             </div>
         </div>
@@ -289,21 +289,21 @@
                                     <td class="align-middle">
                                         <div class="input-group quantity mx-auto" style="width: 100px;">
                                             <div class="input-group-btn">
-                                                <button class="btn btn-sm btn-primary btn-minus" onclick="updateQuantity(@item.CartItemId, -1)">
+                                                <button class="btn btn-sm btn-primary btn-minus" onclick="updateQuantity('@item.CartItemId', -1)">
                                                     <i class="fa fa-minus"></i>
                                                 </button>
                                             </div>
-                                            <input type="text" class="form-control form-control-sm bg-secondary text-center quantity-input" value="@item.Quantity" readonly>
+                                            <input type="text" class="form-control form-control-sm bg-secondary text-center" value="@item.Quantity" id="quantity-@item.CartItemId" readonly>
                                             <div class="input-group-btn">
-                                                <button class="btn btn-sm btn-primary btn-plus" onclick="updateQuantity(@item.CartItemId, 1)">
+                                                <button class="btn btn-sm btn-primary btn-plus" onclick="updateQuantity('@item.CartItemId', 1)">
                                                     <i class="fa fa-plus"></i>
                                                 </button>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="align-middle total-price">@((item.Price * item.Quantity).ToString("C"))</td>
+                                    <td class="align-middle" id="total-@item.CartItemId">@((item.Price * item.Quantity).ToString("C"))</td>
                                     <td class="align-middle">
-                                        <button class="btn btn-sm btn-primary" onclick="removeFromCart(@item.CartItemId)">
+                                        <button class="btn btn-sm btn-primary" onclick="removeFromCart('@item.CartItemId')">
                                             <i class="fa fa-times"></i>
                                         </button>
                                     </td>
@@ -335,7 +335,7 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between mb-3 pt-1">
                             <h6 class="font-weight-medium">Subtotal</h6>
-                            <h6 class="font-weight-medium" id="subtotal">$0</h6>
+                            <h6 class="font-weight-medium" id="subtotal">@(Model != null ? Model.Sum(x => x.Price * x.Quantity).ToString("C") : "$0")</h6>
                         </div>
                         <div class="d-flex justify-content-between">
                             <h6 class="font-weight-medium">Shipping</h6>
@@ -345,7 +345,7 @@
                     <div class="card-footer border-secondary bg-transparent">
                         <div class="d-flex justify-content-between mt-2">
                             <h5 class="font-weight-bold">Total</h5>
-                            <h5 class="font-weight-bold" id="total">$10</h5>
+                            <h5 class="font-weight-bold" id="total">@(Model != null ? (Model.Sum(x => x.Price * x.Quantity) + 10).ToString("C") : "$10")</h5>
                         </div>
                         <a href="/Order/Checkout" class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</a>
                     </div>
@@ -441,7 +441,7 @@
         // Hàm cập nhật số lượng sản phẩm trong giỏ hàng
         function updateQuantity(cartItemId, change) {
             const row = $(`tr[data-cart-item-id="${cartItemId}"]`);
-            const quantityInput = row.find('.quantity-input');
+            const quantityInput = row.find('input[type="text"]');
             let quantity = parseInt(quantityInput.val()) + change;
 
             if (quantity < 1) {
@@ -457,11 +457,11 @@
                     quantityInput.val(quantity);
                     const price = parseFloat(row.find('td[data-price]').data('price'));
                     const total = price * quantity;
-                    row.find('.total-price').text(total.toLocaleString('en-US', { style: 'currency', currency: 'USD' }));
+                    row.find('td:nth-child(4)').text(total.toLocaleString('en-US', { style: 'currency', currency: 'USD' }));
                     updateCartSummary();
                 },
                 error: function (xhr) {
-                    alert('Error updating quantity: ' + xhr.responseJSON?.Message || 'Unknown error');
+                    alert('Error updating quantity: ' + (xhr.responseJSON?.Message || 'Unknown error'));
                 }
             });
         }
@@ -478,7 +478,7 @@
                         updateCartBadge();
                     },
                     error: function (xhr) {
-                        alert('Error removing item: ' + xhr.responseJSON?.Message || 'Unknown error');
+                        alert('Error removing item: ' + (xhr.responseJSON?.Message || 'Unknown error'));
                     }
                 });
             }
@@ -487,12 +487,12 @@
         // Hàm cập nhật tổng giá trị giỏ hàng
         function updateCartSummary() {
             let subtotal = 0;
-            $('.total-price').each(function () {
+            $('td:nth-child(4)').each(function () {
                 const totalText = $(this).text().replace('$', '').replace(',', '');
-                subtotal += parseFloat(totalText);
+                subtotal += parseFloat(totalText) || 0;
             });
 
-            const shipping = 10; // Giá trị cố định cho phí vận chuyển
+            const shipping = 10;
             const total = subtotal + shipping;
 
             $('#subtotal').text(subtotal.toLocaleString('en-US', { style: 'currency', currency: 'USD' }));
@@ -502,7 +502,7 @@
         // Hàm cập nhật số lượng sản phẩm trên biểu tượng giỏ hàng
         function updateCartBadge() {
             const itemCount = $('tbody tr').length;
-            $('.badge').text(itemCount);
+            $('.badge').text(itemCount > 0 ? itemCount : 0);
         }
 
         // Hàm áp dụng mã giảm giá (chưa triển khai logic cụ thể)
@@ -515,11 +515,11 @@
 
         // Hàm sắp xếp danh sách sản phẩm
         $(document).ready(function () {
+            let sortDirection = 'asc';
+
             $('.sort-button').click(function () {
                 const sortBy = $(this).data('sort');
-                const currentSort = $(this).hasClass('asc') ? 'desc' : 'asc';
-                $('.sort-button').removeClass('asc desc');
-                $(this).addClass(currentSort);
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
 
                 const rows = $('tbody tr').get();
                 rows.sort(function (a, b) {
@@ -528,18 +528,15 @@
                         aValue = parseFloat($(a).find('td[data-price]').data('price'));
                         bValue = parseFloat($(b).find('td[data-price]').data('price'));
                     } else if (sortBy === 'total') {
-                        aValue = parseFloat($(a).find('.total-price').text().replace('$', '').replace(',', ''));
-                        bValue = parseFloat($(b).find('.total-price').text().replace('$', '').replace(',', ''));
+                        aValue = parseFloat($(a).find('td:nth-child(4)').text().replace('$', '').replace(',', ''));
+                        bValue = parseFloat($(b).find('td:nth-child(4)').text().replace('$', '').replace(',', ''));
                     }
 
-                    if (currentSort === 'asc') {
-                        return aValue - bValue;
-                    } else {
-                        return bValue - aValue;
-                    }
+                    return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
                 });
 
                 $('tbody').empty().append(rows);
+                updateCartSummary();
             });
 
             // Cập nhật tổng giá trị ban đầu

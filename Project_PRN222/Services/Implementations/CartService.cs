@@ -16,12 +16,12 @@ namespace Project_PRN222.Services.Implementations
             _httpContextAccessor = httpContextAccessor;
         }
 
-        private int GetCurrentUserId()
+        private int? GetCurrentUserId()
         {
-            var userId = int.Parse(_httpContextAccessor.HttpContext.Session.GetString("UserId") ?? "0");
-            if (userId == 0)
+            var userIdString = _httpContextAccessor.HttpContext?.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId) || userId == 0)
             {
-                throw new Exception("User not logged in.");
+                return null; // Trả về null nếu không lấy được UserId
             }
             return userId;
         }
@@ -29,7 +29,12 @@ namespace Project_PRN222.Services.Implementations
         public async Task AddToCart(int productId, int quantity)
         {
             var userId = GetCurrentUserId();
-            var existingItem = await _cartRepository.GetByUserIdAndProductId(userId, productId);
+            if (userId == null)
+            {
+                throw new Exception("User not logged in."); // Giữ nguyên ngoại lệ cho API
+            }
+
+            var existingItem = await _cartRepository.GetByUserIdAndProductId(userId.Value, productId);
             if (existingItem != null)
             {
                 existingItem.Quantity += quantity;
@@ -39,7 +44,7 @@ namespace Project_PRN222.Services.Implementations
             {
                 var cartItem = new CartItem
                 {
-                    UserId = userId,
+                    UserId = userId.Value,
                     ProductId = productId,
                     Quantity = quantity,
                     AddedDate = DateTime.Now
@@ -51,7 +56,12 @@ namespace Project_PRN222.Services.Implementations
         public async Task<IEnumerable<CartItemDto>> GetCartItems()
         {
             var userId = GetCurrentUserId();
-            var cartItems = await _cartRepository.GetByUserId(userId);
+            if (userId == null)
+            {
+                return new List<CartItemDto>(); // Trả về danh sách rỗng nếu không lấy được UserId
+            }
+
+            var cartItems = await _cartRepository.GetByUserId(userId.Value);
             return cartItems.Select(c => new CartItemDto
             {
                 CartItemId = c.CartItemId,
@@ -67,6 +77,11 @@ namespace Project_PRN222.Services.Implementations
         public async Task UpdateCartItem(int cartItemId, int quantity)
         {
             var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                throw new Exception("User not logged in."); // Giữ nguyên ngoại lệ cho API
+            }
+
             var cartItem = await _cartRepository.GetById(cartItemId);
             if (cartItem == null || cartItem.UserId != userId)
             {
@@ -79,6 +94,11 @@ namespace Project_PRN222.Services.Implementations
         public async Task RemoveFromCart(int cartItemId)
         {
             var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                throw new Exception("User not logged in."); // Giữ nguyên ngoại lệ cho API
+            }
+
             var cartItem = await _cartRepository.GetById(cartItemId);
             if (cartItem == null || cartItem.UserId != userId)
             {
