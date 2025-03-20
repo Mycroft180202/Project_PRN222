@@ -190,7 +190,7 @@
                                 <a href="@Url.Action("Privacy", "Home")" class="nav-item nav-link">Privacy</a>
                                 <a href="@Url.Action("Contact", "Home")" class="nav-item nav-link">Contact</a>
                             </div>
-                            <!-- Navbar chỉnh sửa để Role 1, 2 vào Index thay vì Dashboard -->
+                            <!-- Navbar không chuyển hướng tự động cho Role 1, 2 -->
                             <div class="navbar-nav ml-auto py-0">
                                 @if (User.Identity.IsAuthenticated)
                                 {
@@ -199,16 +199,16 @@
                                             Welcome, @User.Identity.Name
                                         </a>
                                         <div class="dropdown-menu rounded-0 m-0">
-                                            <!-- Kiểm tra RoleId từ Claims -->
+                                            <!-- Liên kết dashboard cho Role 1, 2 nhưng không chuyển hướng tự động -->
                                             @{
                                                 var roleId = User.Claims.FirstOrDefault(c => c.Type == "RoleId")?.Value;
                                                 if (roleId == "1") // ADMIN
                                                 {
-                                                    <a href="@Url.Action("Index", "Admin")" class="dropdown-item">Admin Dashboard</a>
+                                                    <a href="@Url.Action("AdminDashboard", "Home")" class="dropdown-item">Admin Dashboard</a>
                                                 }
                                                 else if (roleId == "2") // VENDOR
                                                 {
-                                                    <a href="@Url.Action("Index", "Vendor")" class="dropdown-item">Vendor Dashboard</a>
+                                                    <a href="@Url.Action("VendorDashboard", "Home")" class="dropdown-item">Vendor Dashboard</a>
                                                 }
                                             }
                                             <!-- Hiển thị Profile cho tất cả Role -->

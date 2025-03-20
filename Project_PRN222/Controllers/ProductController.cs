@@ -143,24 +143,47 @@ namespace Project_PRN222.Controllers
 
         // Chỉ Admin và Vendor (nếu sở hữu sản phẩm) được sửa
         [HttpPut("api/products/{id}")]
-        public IActionResult UpdateProductApi(int id, [FromBody] Product product)
+public IActionResult UpdateProductApi(int id, [FromBody] Product product)
+{
+    try
+    {
+        if (id != product.ProductId)
         {
-            if (id != product.ProductId)
-            {
-                return BadRequest("ID in request path and body do not match.");
-            }
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            var existingProduct = _productService.GetProductById(id);
-            if (existingProduct == null)
-            {
-                return NotFound();
-            }
-            _productService.UpdateProduct(product);
-            return NoContent();
+            return BadRequest("ID in request path and body do not match.");
         }
+
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.SelectMany(x => x.Value.Errors).Select(x => x.ErrorMessage);
+            return BadRequest(new { Errors = errors });
+        }
+
+        var existingProduct = _productService.GetProductById(id);
+        if (existingProduct == null)
+        {
+            return NotFound();
+        }
+
+        // Cập nhật các trường cần thiết
+        existingProduct.ProductName = product.ProductName;
+        existingProduct.Description = product.Description;
+        existingProduct.Price = product.Price;
+        existingProduct.StockQuantity = product.StockQuantity;
+        existingProduct.ImageUrl = product.ImageUrl;
+        existingProduct.CategoryId = product.CategoryId;
+        existingProduct.VendorId = product.VendorId; // Giữ nguyên nếu có quyền chỉnh sửa
+        existingProduct.UpdatedDate = DateTime.Now; // Cập nhật thời gian chỉnh sửa
+
+        _productService.UpdateProduct(existingProduct);
+        return NoContent();
+    }
+    catch (Exception ex)
+    {
+        // Log lỗi để debug
+        Console.WriteLine($"Error updating product: {ex.Message}");
+        return StatusCode(500, "An error occurred while updating the product.");
+    }
+}
 
         // Action to return Delete Product Confirmation View (Admin, Vendor) - Optional
         [HttpGet("DeleteConfirmationView/{id}")]

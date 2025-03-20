@@ -1,5 +1,5 @@
 ﻿@model Project_PRN222.Models.User
-@using System.Security.Claims // Thêm namespace để dùng ClaimTypes
+@using System.Security.Claims
 
 @{
     ViewData["Title"] = "Profile - EShopper";
@@ -8,8 +8,13 @@
     // Kiểm tra lỗi 404 hoặc dữ liệu không hợp lệ
     bool hasError = Model == null || !User.Identity.IsAuthenticated;
 
-    // Lấy RoleId từ Model để kiểm tra quyền
-    int roleId = Model?.RoleId ?? 0;
+    // Lấy RoleId từ Model để kiểm tra quyền, fallback về Claims nếu Model không đúng
+    int roleIdFromModel = Model?.RoleId ?? 0;
+    string roleIdFromClaims = User.Claims.FirstOrDefault(c => c.Type == "RoleId")?.Value;
+    int roleId = roleIdFromClaims != null && int.TryParse(roleIdFromClaims, out int claimRoleId) ? claimRoleId : roleIdFromModel;
+
+    // Debug để kiểm tra
+    var debugMessage = $"Model.RoleId: {roleIdFromModel}, Claims.RoleId: {roleIdFromClaims}, Final RoleId: {roleId}";
 }
 
 <!DOCTYPE html>
@@ -52,51 +57,68 @@
             color: #D19C97;
         }
 
+        .navbar-container {
+            background: #fff;
+            border-bottom: 1px solid #e8ecef;
+            padding: 0 15px;
+        }
+
         .profile-container {
             padding: 40px;
             background: #fff;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             margin: 20px auto;
-            max-width: 800px;
+            max-width: 1000px;
         }
 
-            .profile-container h2 {
-                color: #333;
-                font-weight: 600;
-                margin-bottom: 30px;
-                text-align: center;
-            }
+        .profile-container h2 {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: center;
+        }
 
-            .profile-container .form-group label {
-                font-weight: 500;
-                color: #333;
-            }
+        .profile-container .form-group label {
+            font-weight: 500;
+            color: #333;
+        }
 
-            .profile-container .form-control {
-                border-radius: 5px;
-                background: #f8f9fa;
-            }
+        .profile-container .form-control {
+            border-radius: 5px;
+            background: #f8f9fa;
+        }
 
         .btn-primary {
             background: #D19C97;
             border: none;
         }
 
-            .btn-primary:hover {
-                background: #c08b86;
-            }
+        .btn-primary:hover {
+            background: #c08b86;
+        }
 
         .error-message {
             text-align: center;
             color: #dc3545;
             margin: 20px 0;
         }
+
+        .container-fluid {
+            padding: 0 15px;
+        }
+
+        .debug-message {
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 
 <body>
-    <!-- Topbar Start (Đồng bộ với Home/Index.cshtml) -->
+    <!-- Topbar Start -->
     <div class="container-fluid">
         <div class="row bg-secondary py-2 px-xl-5">
             <div class="col-lg-6 d-none d-lg-block">
@@ -118,115 +140,71 @@
                 </div>
             </div>
         </div>
-        <!-- Navbar Start (Sao chép từ Home/Index.cshtml) -->
-        <div class="row border-top px-xl-5">
-            <div class="col-lg-3 d-none d-lg-block">
-                <a class="btn shadow-none d-flex align-items-center justify-content-between bg-primary text-white w-100" data-toggle="collapse" href="#navbar-vertical" style="height: 65px; margin-top: -1px; padding: 0 30px;">
-                    <h6 class="m-0">Categories</h6>
-                    <i class="fa fa-angle-down text-dark"></i>
+        <!-- Navbar Start (Không có Category) -->
+        <div class="navbar-container">
+            <nav class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-0">
+                <a href="@Url.Action("Index", "Home")" class="text-decoration-none d-block d-lg-none">
+                    <h1 class="m-0 display-5 font-weight-semi-bold"><span class="text-primary font-weight-bold border px-3 mr-1">E</span>Shopper</h1>
                 </a>
-                <nav class="collapse show navbar navbar-vertical navbar-light align-items-start p-0 border border-top-0 border-bottom-0" id="navbar-vertical">
-                    <div class="navbar-nav w-100 overflow-hidden" style="height: 410px">
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                    <div class="navbar-nav mr-auto py-0">
+                        <a href="@Url.Action("Index", "Home")" class="nav-item nav-link active">Home</a>
+                        <a href="/Product/Index" class="nav-item nav-link">Shop</a>
                         <div class="nav-item dropdown">
-                            <a href="#" class="nav-link" data-toggle="dropdown">Bat Trang Ceramics <i class="fa fa-angle-down float-right mt-1"></i></a>
-                            <div class="dropdown-menu position-absolute bg-secondary border-0 rounded-0 w-100 m-0">
-                                <a href="@Url.Action("Shop", "Home", new { category = "ceramics" })" class="dropdown-item">Decorative Ceramics</a>
-                                <a href="@Url.Action("Shop", "Home", new { category = "ceramics" })" class="dropdown-item">Household Ceramics</a>
-                                <a href="@Url.Action("Shop", "Home", new { category = "ceramics" })" class="dropdown-item">Artistic Ceramics</a>
+                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages</a>
+                            <div class="dropdown-menu rounded-0 m-0">
+                                <a href="/Cart/Cart" class="dropdown-item">Shopping Cart</a>
+                                <a href="/Order/Checkout" class="dropdown-item">Checkout</a>
                             </div>
                         </div>
-                        <div class="nav-item dropdown">
-                            <a href="#" class="nav-link" data-toggle="dropdown">Silk <i class="fa fa-angle-down float-right mt-1"></i></a>
-                            <div class="dropdown-menu position-absolute bg-secondary border-0 rounded-0 w-100 m-0">
-                                <a href="@Url.Action("Shop", "Home", new { category = "silk" })" class="dropdown-item">Silk Clothing</a>
-                                <a href="@Url.Action("Shop", "Home", new { category = "silk" })" class="dropdown-item">Silk Scarves</a>
-                                <a href="@Url.Action("Shop", "Home", new { category = "silk" })" class="dropdown-item">Silk Accessories</a>
-                            </div>
-                        </div>
-                        <div class="nav-item dropdown">
-                            <a href="#" class="nav-link" data-toggle="dropdown">Bamboo & Rattan Weaving <i class="fa fa-angle-down float-right mt-1"></i></a>
-                            <div class="dropdown-menu position-absolute bg-secondary border-0 rounded-0 w-100 m-0">
-                                <a href="@Url.Action("Shop", "Home", new { category = "bamboo" })" class="dropdown-item">Baskets</a>
-                                <a href="@Url.Action("Shop", "Home", new { category = "bamboo" })" class="dropdown-item">Furniture</a>
-                                <a href="@Url.Action("Shop", "Home", new { category = "bamboo" })" class="dropdown-item">Decorative Items</a>
-                            </div>
-                        </div>
-                        <div class="nav-item dropdown">
-                            <a href="#" class="nav-link" data-toggle="dropdown">Conical Hats <i class="fa fa-angle-down float-right mt-1"></i></a>
-                            <div class="dropdown-menu position-absolute bg-secondary border-0 rounded-0 w-100 m-0">
-                                <a href="@Url.Action("Shop", "Home", new { category = "conical" })" class="dropdown-item">Traditional Conical Hats</a>
-                                <a href="@Url.Action("Shop", "Home", new { category = "conical" })" class="dropdown-item">Decorated Conical Hats</a>
-                                <a href="@Url.Action("Shop", "Home", new { category = "conical" })" class="dropdown-item">Modern Conical Hats</a>
-                            </div>
-                        </div>
+                        <a href="@Url.Action("Privacy", "Home")" class="nav-item nav-link">Privacy</a>
+                        <a href="@Url.Action("Contact", "Home")" class="nav-item nav-link">Contact</a>
                     </div>
-                </nav>
-            </div>
-            <div class="col-lg-9">
-                <nav class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-0">
-                    <a href="@Url.Action("Index", "Home")" class="text-decoration-none d-block d-lg-none">
-                        <h1 class="m-0 display-5 font-weight-semi-bold"><span class="text-primary font-weight-bold border px-3 mr-1">E</span>Shopper</h1>
-                    </a>
-                    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
-                        <div class="navbar-nav mr-auto py-0">
-                            <a href="@Url.Action("Index", "Home")" class="nav-item nav-link active">Home</a>
-                            <a href="/Product/Index" class="nav-item nav-link">Shop</a>
+                    <div class="navbar-nav ml-auto py-0">
+                        @if (User.Identity.IsAuthenticated)
+                        {
                             <div class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages</a>
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                                    Welcome, @User.Identity.Name
+                                </a>
                                 <div class="dropdown-menu rounded-0 m-0">
-                                    <a href="/Cart/Cart" class="dropdown-item">Shopping Cart</a>
-                                    <a href="/Order/Checkout" class="dropdown-item">Checkout</a>
+                                    @{
+                                        var roleIdNav = User.Claims.FirstOrDefault(c => c.Type == "RoleId")?.Value;
+                                        if (roleIdNav == "1") // ADMIN
+                                        {
+                                            <a href="@Url.Action("AdminDashboard", "Home")" class="dropdown-item">Admin Dashboard</a>
+                                        }
+                                        else if (roleIdNav == "2") // VENDOR
+                                        {
+                                            <a href="@Url.Action("VendornDashboard", "Home")" class="dropdown-item">Vendor Dashboard</a>
+                                        }
+                                    }
+                                    @if (User.Identity.IsAuthenticated && (roleIdNav == "1" || roleIdNav == "2" || roleIdNav == "3"))
+                                    {
+                                        <a href="@Url.Action("ProfileView", "User")" class="dropdown-item">Profile</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="dropdown-item text-muted">Profile (Access Denied)</span>
+                                    }
+                                    <form asp-action="Logout" asp-controller="Auth" method="post" style="margin: 0;">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="dropdown-item">Logout</button>
+                                    </form>
                                 </div>
                             </div>
-                            <a href="@Url.Action("Privacy", "Home")" class="nav-item nav-link">Privacy</a>
-                            <a href="@Url.Action("Contact", "Home")" class="nav-item nav-link">Contact</a>
-                        </div>
-                        <div class="navbar-nav ml-auto py-0">
-                            @if (User.Identity.IsAuthenticated)
-                            {
-                                <div class="nav-item dropdown">
-                                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
-                                        Welcome, @User.Identity.Name
-                                    </a>
-                                    <div class="dropdown-menu rounded-0 m-0">
-                                        @{
-                                            var roleIdNav = User.Claims.FirstOrDefault(c => c.Type == "RoleId")?.Value;
-                                            if (roleIdNav == "1") // ADMIN
-                                            {
-                                                <a href="@Url.Action("Index", "Admin")" class="dropdown-item">Admin Dashboard</a>
-                                            }
-                                            else if (roleIdNav == "2") // VENDOR
-                                            {
-                                                <a href="@Url.Action("Index", "Vendor")" class="dropdown-item">Vendor Dashboard</a>
-                                            }
-                                        }
-                                        @if (User.Identity.IsAuthenticated && (roleIdNav == "1" || roleIdNav == "2" || roleIdNav == "3"))
-                                        {
-                                            <a href="@Url.Action("ProfileView", "User")" class="dropdown-item">Profile</a>
-                                        }
-                                        else
-                                        {
-                                            <span class="dropdown-item text-muted">Profile (Access Denied)</span>
-                                        }
-                                        <form asp-action="Logout" asp-controller="Auth" method="post" style="margin: 0;">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="dropdown-item">Logout</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            }
-                            else
-                            {
-                                <a href="@Url.Action("Login", "Auth")" class="nav-item nav-link">Login</a>
-                                <a href="@Url.Action("Register", "Auth")" class="nav-item nav-link">Register</a>
-                            }
-                        </div>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Login", "Auth")" class="nav-item nav-link">Login</a>
+                            <a href="@Url.Action("Register", "Auth")" class="nav-item nav-link">Register</a>
+                        }
                     </div>
-                </nav>
-            </div>
+                </div>
+            </nav>
         </div>
     </div>
 
@@ -249,6 +227,8 @@
             <!-- Hiển thị thông tin người dùng từ Model -->
             <div class="profile-container">
                 <h2><i class="fas fa-user mr-2"></i> My Profile</h2>
+                
+                
                 <form id="profileForm" asp-action="UpdateMyProfile" asp-controller="User" method="put">
                     @Html.AntiForgeryToken()
                     <div class="form-group">
@@ -285,27 +265,66 @@
                     </div>
                     <div class="form-group">
                         <label><i class="fas fa-toggle-on mr-2"></i> Active</label>
-                        <select class="form-control" disabled>
-                            <option value="true" selected="@(Model.IsActive == true ? "selected" : "")">Yes</option>
-                            <option value="false" selected="@(Model.IsActive == false ? "selected" : "")">No</option>
-                        </select>
+                        
                     </div>
                     <div class="form-group">
                         <label><i class="fas fa-user-shield mr-2"></i> Role</label>
                         @if (roleId == 3) // Role 3 không được sửa RoleId
                         {
                             <select class="form-control" disabled>
-                                <option value="1" selected="@(Model.RoleId == 1 ? "selected" : "")">Admin</option>
-                                <option value="2" selected="@(Model.RoleId == 2 ? "selected" : "")">Vendor</option>
-                                <option value="3" selected="@(Model.RoleId == 3 ? "selected" : "")">User</option>
+                                @if (roleId == 1)
+                                {
+                                    <option value="1" selected>Admin</option>
+                                }
+                                else
+                                {
+                                    <option value="1">Admin</option>
+                                }
+                                @if (roleId == 2)
+                                {
+                                    <option value="2" selected>Vendor</option>
+                                }
+                                else
+                                {
+                                    <option value="2">Vendor</option>
+                                }
+                                @if (roleId == 3)
+                                {
+                                    <option value="3" selected>User</option>
+                                }
+                                else
+                                {
+                                    <option value="3">User</option>
+                                }
                             </select>
                         }
                         else // Role 1, 2 có thể sửa RoleId
                         {
                             <select class="form-control" id="roleId" name="RoleId">
-                                <option value="1" selected="@(Model.RoleId == 1 ? "selected" : "")">Admin</option>
-                                <option value="2" selected="@(Model.RoleId == 2 ? "selected" : "")">Vendor</option>
-                                <option value="3" selected="@(Model.RoleId == 3 ? "selected" : "")">User</option>
+                                @if (roleId == 1)
+                                {
+                                    <option value="1" selected>Admin</option>
+                                }
+                                else
+                                {
+                                    <option value="1">Admin</option>
+                                }
+                                @if (roleId == 2)
+                                {
+                                    <option value="2" selected>Vendor</option>
+                                }
+                                else
+                                {
+                                    <option value="2">Vendor</option>
+                                }
+                                @if (roleId == 3)
+                                {
+                                    <option value="3" selected>User</option>
+                                }
+                                else
+                                {
+                                    <option value="3">User</option>
+                                }
                             </select>
                         }
                     </div>
@@ -318,7 +337,7 @@
         }
     </div>
 
-    <!-- Footer Start (Đồng bộ với Home/Index.cshtml) -->
+    <!-- Footer Start -->
     <div class="container-fluid bg-secondary text-dark mt-5 pt-5">
         <div class="row px-xl-5 pt-5">
             <div class="col-lg-4 col-md-12 mb-5 pr-3 pr-xl-5">
@@ -382,6 +401,7 @@
         </div>
     </div>
     <!-- Footer End -->
+
     <!-- Back to Top -->
     <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
 
@@ -409,17 +429,20 @@
                     RoleId: $('#roleId') ? $('#roleId').val() : @Model.RoleId // RoleId chỉ gửi nếu có trường select
                 };
 
+                console.log("Sending data:", formData); // Debug dữ liệu gửi đi
+
                 $.ajax({
                     url: '/api/User/me',
                     type: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify(formData),
-                    success: function () {
+                    success: function (response) {
                         alert('Profile updated successfully!');
                         window.location.reload(); // Tải lại trang để cập nhật giao diện
                     },
                     error: function (xhr) {
-                        alert('Error updating profile: ' + xhr.responseText);
+                        var errorMessage = xhr.responseText || 'An error occurred while updating the profile.';
+                        alert('Error updating profile: ' + errorMessage);
                     }
                 });
             });

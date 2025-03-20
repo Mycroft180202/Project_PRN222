@@ -2,17 +2,10 @@
     ViewData["Title"] = "Admin Dashboard - EShopper";
     Layout = null; // Disable default layout
 
-    // Static data for interface display (Backend Note: Replace these mock data with real data from services like IUserService, IProductService, and ISalesStatisticsService)
-    var mockUsers = new List<dynamic>
-    {
-        new { UserId = 1, UserName = "johndoe", Email = "john@example.com", FirstName = "John", LastName = "Doe", PhoneNumber = "+123456789", Address = "123 Main St", IsActive = true, RoleId = 1 }
-    };
+    // Kiểm tra lỗi 404 (thay bằng logic thực tế từ backend nếu cần)
+    var is404 = ViewBag.Is404 ?? false;
 
-    var mockProducts = new List<dynamic>
-    {
-        new { ProductId = 1, ProductName = "Sample Product", Description = "Beautiful handmade item", Price = 50.00M, StockQuantity = 100, ImageUrl = "/img/product-1.jpg", CategoryId = 1, CreatedDate = DateTime.Parse("2023-01-01"), UpdatedDate = DateTime.Parse("2023-01-02") }
-    };
-
+    // Dữ liệu tĩnh cho Sales Statistics (Backend Note: Replace với real data từ ISalesStatisticsService)
     var mockSalesStatistics = new List<dynamic>
     {
         new { StatisticId = 1, ReportDate = DateTime.Parse("2023-01-01"), ProductId = 1, CategoryId = 1, TotalQuantitySold = 50, TotalRevenue = 2500.00M, TimeDimension = "Monthly" }
@@ -36,46 +29,45 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"> <!-- Cập nhật Font Awesome 6 -->
-    <!-- Bootstrap 5 Stylesheet (Cập nhật lên Bootstrap 5) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Bootstrap 5 Stylesheet -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom Styles -->
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #e8ecef; /* Màu sữa */
-            color: #333333; /* Đen */
+            background-color: #e8ecef;
+            color: #333333;
             margin: 0;
             padding: 0;
         }
 
-        /* Main Container */
         .container-fluid {
             padding: 0;
             display: flex;
             height: 100vh;
         }
 
-        /* Sidebar */
         .sidebar {
             width: 250px;
-            background-color: #ffffff; /* Trắng */
+            background-color: #ffffff;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
             padding: 20px 0;
             flex-shrink: 0;
         }
 
             .sidebar h4 {
-                color: #333333; /* Đen */
+                color: #333333;
                 font-weight: 600;
                 padding: 0 20px 20px;
                 margin: 0;
-                border-bottom: 1px solid #e8ecef; /* Sữa */
+                border-bottom: 1px solid #e8ecef;
             }
 
             .sidebar a {
-                color: #333333; /* Đen */
+                color: #333333;
                 padding: 12px 20px;
                 display: flex;
                 align-items: center;
@@ -90,20 +82,19 @@
 
                 .sidebar a:hover,
                 .sidebar a.active {
-                    background-color: #e8ecef; /* Sữa */
-                    color: #333333; /* Đen */
+                    background-color: #e8ecef;
+                    color: #333333;
                 }
 
-        /* Main Content */
         .content {
             flex-grow: 1;
             padding: 30px;
             overflow-y: auto;
-            background-color: #e8ecef; /* Sữa */
+            background-color: #e8ecef;
         }
 
             .content h2 {
-                color: #333333; /* Đen */
+                color: #333333;
                 font-weight: 600;
                 margin-bottom: 30px;
                 text-align: center;
@@ -113,7 +104,7 @@
             border: none;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            background-color: #ffffff; /* Trắng */
+            background-color: #ffffff;
             margin-bottom: 30px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
@@ -124,7 +115,7 @@
             }
 
         .card-header {
-            background-color: #333333; /* Đen */
+            background-color: #333333;
             border-bottom: none;
             padding: 15px 20px;
             border-radius: 10px 10px 0 0;
@@ -134,40 +125,40 @@
         }
 
             .card-header h3 {
-                color: #ffffff; /* Trắng */
+                color: #ffffff;
                 font-weight: 500;
                 margin: 0;
             }
 
         .btn-primary {
-            background-color: #333333; /* Đen */
+            background-color: #333333;
             border-color: #333333;
             border-radius: 5px;
             padding: 8px 20px;
-            color: #ffffff; /* Trắng */
+            color: #ffffff;
             transition: all 0.3s ease;
         }
 
             .btn-primary:hover {
-                background-color: #555555; /* Đen sáng hơn */
+                background-color: #555555;
                 border-color: #555555;
             }
 
         .btn-warning {
-            background-color: #e8ecef; /* Sữa */
+            background-color: #e8ecef;
             border-color: #e8ecef;
-            color: #333333; /* Đen */
+            color: #333333;
             padding: 6px 12px;
             transition: all 0.3s ease;
         }
 
             .btn-warning:hover {
-                background-color: #d3d7dc; /* Sữa đậm hơn */
+                background-color: #d3d7dc;
                 border-color: #d3d7dc;
             }
 
         .btn-danger {
-            background-color: #ff4d4d; /* Đỏ để giữ sự nổi bật */
+            background-color: #ff4d4d;
             border-color: #ff4d4d;
             padding: 6px 12px;
             transition: all 0.3s ease;
@@ -179,21 +170,21 @@
             }
 
         .table {
-            background-color: #ffffff; /* Trắng */
+            background-color: #ffffff;
             border-radius: 0 0 10px 10px;
             margin-bottom: 0;
         }
 
             .table thead th {
-                background-color: #e8ecef; /* Sữa */
-                color: #333333; /* Đen */
+                background-color: #e8ecef;
+                color: #333333;
                 font-weight: 500;
                 border: none;
                 padding: 12px;
             }
 
             .table tbody tr:hover {
-                background-color: #f8f9fa; /* Sữa nhạt */
+                background-color: #f8f9fa;
             }
 
             .table td {
@@ -201,29 +192,28 @@
                 padding: 12px;
             }
 
-        /* Modal */
         .modal-content {
             border-radius: 10px;
             border: none;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            background-color: #ffffff; /* Trắng */
+            background-color: #ffffff;
         }
 
         .modal-header {
-            background-color: #333333; /* Đen */
+            background-color: #333333;
             border-bottom: none;
             border-radius: 10px 10px 0 0;
             padding: 15px 20px;
         }
 
         .modal-title {
-            color: #ffffff; /* Trắng */
+            color: #ffffff;
             font-weight: 500;
         }
 
         .modal-body {
             padding: 20px;
-            background-color: #ffffff; /* Trắng */
+            background-color: #ffffff;
         }
 
         .form-group {
@@ -232,223 +222,325 @@
 
         .form-control {
             border-radius: 5px;
-            border: 1px solid #e8ecef; /* Sữa */
+            border: 1px solid #e8ecef;
             padding: 10px;
             width: 100%;
-            background-color: #fafafa; /* Sữa nhạt */
+            background-color: #fafafa;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
             .form-control:focus {
-                border-color: #333333; /* Đen */
+                border-color: #333333;
                 box-shadow: 0 0 5px rgba(51, 51, 51, 0.3);
-                background-color: #ffffff; /* Trắng */
+                background-color: #ffffff;
             }
 
         .modal-footer {
             padding: 15px 20px;
             border-top: none;
-            background-color: #ffffff; /* Trắng */
+            background-color: #ffffff;
         }
 
             .modal-footer .btn-secondary {
-                background-color: #e8ecef; /* Sữa */
+                background-color: #e8ecef;
                 border-color: #e8ecef;
-                color: #333333; /* Đen */
+                color: #333333;
             }
 
                 .modal-footer .btn-secondary:hover {
-                    background-color: #d3d7dc; /* Sữa đậm hơn */
+                    background-color: #d3d7dc;
                     border-color: #d3d7dc;
                 }
 
             .modal-footer .btn-primary {
-                background-color: #333333; /* Đen */
+                background-color: #333333;
                 border-color: #333333;
-                color: #ffffff; /* Trắng */
+                color: #ffffff;
             }
 
                 .modal-footer .btn-primary:hover {
-                    background-color: #555555; /* Đen sáng hơn */
+                    background-color: #555555;
                     border-color: #555555;
                 }
+
+        .error-404 {
+            text-align: center;
+            padding: 50px;
+        }
+
+            .error-404 h1 {
+                font-size: 5rem;
+                color: #ff4d4d;
+                margin-bottom: 20px;
+            }
+
+            .error-404 h2 {
+                font-size: 2rem;
+                color: #333333;
+                margin-bottom: 20px;
+            }
+
+            .error-404 p {
+                font-size: 1.2rem;
+                color: #666666;
+                margin-bottom: 10px;
+            }
     </style>
 </head>
 
 <body>
-    <!-- Main Container -->
-    <div class="container-fluid">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <h4>Admin Dashboard</h4>
-            <a class="nav-link active" data-tab="users"><i class="fas fa-users"></i> User Management</a>
-            <a class="nav-link" data-tab="products"><i class="fas fa-box"></i> Product Management</a>
-            <a class="nav-link" data-tab="sales-statistics"><i class="fas fa-chart-line"></i> Sales Statistics</a>
-            <!-- Backend Note: Ensure the AuthController has a Logout action to handle this POST request -->
-            <form asp-action="Logout" asp-controller="Auth" method="post" style="margin: 0;">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="nav-link" style="border: none; background: none; width: 100%; text-align: left;margin-left:20px"><i class="fas fa-sign-out-alt"></i> Logout</button>
-            </form>
+    @if (is404)
+    {
+        <!-- Trang lỗi 404 -->
+        <div class="container-fluid error-404">
+            <h1>Error 404 (Not Found)!!1</h1>
+            <h2>That’s an error.</h2>
+            <p>The requested URL was not found on this server. That’s all we know.</p>
+            <p><strong># 404 Not Found</strong></p>
+            <p>Powered by nginx</p>
+            <a href="@Url.Action("Index", "Home")" class="btn btn-primary mt-3">Back to Home</a>
         </div>
+    }
+    else
+    {
+        <!-- Main Container -->
+        <div class="container-fluid">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h4>Admin Dashboard</h4>
+                <a class="nav-link active" data-tab="users"><i class="fas fa-users"></i> User Management</a>
+                <a class="nav-link" data-tab="products"><i class="fas fa-box"></i> Product Management</a>
+                <a class="nav-link" data-tab="sales-statistics"><i class="fas fa-chart-line"></i> Sales Statistics</a>
+                <form asp-action="Logout" asp-controller="Auth" method="post" style="margin: 0;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="nav-link" style="border: none; background: none; width: 100%; text-align: left; margin-left: 20px"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </form>
+            </div>
 
-        <!-- Main Content -->
-        <div class="content">
-            <h2>Admin Management</h2>
+            <!-- Main Content -->
+            <div class="content">
+                <h2>Admin Management</h2>
 
-            <!-- Tab Content -->
-            <div class="tab-content">
-                <!-- User Management Tab -->
-                <div class="tab-pane fade show active" id="users">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Users</h3>
-                            
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Username</th>
-                                            <th>Email</th>
-                                            <th>First Name</th>
-                                            <th>Last Name</th>
-                                            <th>Phone Number</th>
-                                            <th>Address</th>
-                                            <th>Active</th>
-                                            <th>Role</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- Backend Note: Replace this foreach loop with data from IUserService -->
-                                        @foreach (var user in mockUsers)
-                                        {
+                <!-- Tab Content -->
+                <div class="tab-content">
+                    <!-- User Management Tab -->
+                    <div class="tab-pane fade show active" id="users">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Users</h3>
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">Add User</button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table" id="userTable">
+                                        <thead>
                                             <tr>
-                                                <td>@user.UserId</td>
-                                                <td>@user.UserName</td>
-                                                <td>@user.Email</td>
-                                                <td>@user.FirstName</td>
-                                                <td>@user.LastName</td>
-                                                <td>@user.PhoneNumber</td>
-                                                <td>@user.Address</td>
-                                                <td>@(user.IsActive ? "Yes" : "No")</td>
-                                                <td>@user.RoleId</td>
-                                                <td>
-                                                    <!-- Backend Note: Link to UserController's EditRoleView and Delete actions -->
-                                                    <a class="btn btn-warning mr-2" href="@Url.Action("EditRoleView", "User", new { id = user.UserId })">Edit</a>
-                                                    <a class="btn btn-danger" href="@Url.Action("Delete", "User", new { id = user.UserId })">Delete</a>
-                                                </td>
+                                                <th>ID</th>
+                                                <th>Username</th>
+                                                <th>Email</th>
+                                                <th>First Name</th>
+                                                <th>Last Name</th>
+                                                <th>Phone Number</th>
+                                                <th>Address</th>
+                                                <th>Active</th>
+                                                <th>Role</th>
+                                                <th>Actions</th>
                                             </tr>
-                                        }
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Dữ liệu sẽ được tải qua AJAX từ api/User -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Management Tab -->
+                    <div class="tab-pane fade" id="products">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Products</h3>
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">Add Product</button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table" id="productTable">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Name</th>
+                                                <th>Description</th>
+                                                <th>Price</th>
+                                                <th>Stock Quantity</th>
+                                                <th>Image</th>
+                                                <th>Category</th>
+                                                <th>Vendor</th>
+                                                <th>Created Date</th>
+                                                <th>Updated Date</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Dữ liệu sẽ được tải qua AJAX từ api/products -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sales Statistics Tab -->
+                    <div class="tab-pane fade" id="sales-statistics">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Sales Statistics</h3>
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSalesStatisticModal">Add Statistic</button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Report Date</th>
+                                                <th>Product ID</th>
+                                                <th>Category ID</th>
+                                                <th>Total Quantity Sold</th>
+                                                <th>Total Revenue</th>
+                                                <th>Time Dimension</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var stat in mockSalesStatistics)
+                                            {
+                                                <tr>
+                                                    <td>@stat.StatisticId</td>
+                                                    <td>@stat.ReportDate.ToString("yyyy-MM-dd")</td>
+                                                    <td>@stat.ProductId</td>
+                                                    <td>@stat.CategoryId</td>
+                                                    <td>@stat.TotalQuantitySold</td>
+                                                    <td>@stat.TotalRevenue</td>
+                                                    <td>@stat.TimeDimension</td>
+                                                    <td>
+                                                        <button class="btn btn-warning mr-2" data-bs-toggle="modal" data-bs-target="#editSalesStatisticModal">Edit</button>
+                                                        <a class="btn btn-danger" href="#">Delete</a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    }
 
-                <!-- Product Management Tab -->
-                <div class="tab-pane fade" id="products">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Products</h3>
-                            <!-- Backend Note: Link to a ProductController's CreateView action for adding new products -->
-                            <a class="btn btn-primary" href="@Url.Action("CreateView", "Product")">Add Product</a>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Name</th>
-                                            <th>Description</th>
-                                            <th>Price</th>
-                                            <th>Stock Quantity</th>
-                                            <th>Image</th>
-                                            <th>Category</th>
-                                            <th>Created Date</th>
-                                            <th>Updated Date</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- Backend Note: Replace this foreach loop with data from IProductService -->
-                                        @foreach (var product in mockProducts)
-                                        {
-                                            <tr>
-                                                <td>@product.ProductId</td>
-                                                <td>@product.ProductName</td>
-                                                <td>@product.Description</td>
-                                                <td>@product.Price</td>
-                                                <td>@product.StockQuantity</td>
-                                                <td>@product.ImageUrl</td>
-                                                <td>@product.CategoryId</td>
-                                                <td>@product.CreatedDate.ToString("yyyy-MM-dd")</td>
-                                                <td>@product.UpdatedDate.ToString("yyyy-MM-dd")</td>
-                                                <td>
-                                                    <!-- Backend Note: Link to ProductController's EditView and DeleteProductApi actions -->
-                                                    <a class="btn btn-warning mr-2" href="@Url.Action("EditView", "Product", new { id = product.ProductId })">Edit</a>
-                                                    <a class="btn btn-danger" href="@Url.Action("DeleteProductApi", "Product", new { id = product.ProductId })">Delete</a>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-
-                <!-- Sales Statistics Tab -->
-                <div class="tab-pane fade" id="sales-statistics">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Sales Statistics</h3>
-                            <!-- Backend Note: Add functionality to open modal and link to SalesStatisticsController's Create action -->
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSalesStatisticModal">Add Statistic</button>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Report Date</th>
-                                            <th>Product ID</th>
-                                            <th>Category ID</th>
-                                            <th>Total Quantity Sold</th>
-                                            <th>Total Revenue</th>
-                                            <th>Time Dimension</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- Backend Note: Replace this foreach loop with data from ISalesStatisticsService -->
-                                        @foreach (var stat in mockSalesStatistics)
-                                        {
-                                            <tr>
-                                                <td>@stat.StatisticId</td>
-                                                <td>@stat.ReportDate.ToString("yyyy-MM-dd")</td>
-                                                <td>@stat.ProductId</td>
-                                                <td>@stat.CategoryId</td>
-                                                <td>@stat.TotalQuantitySold</td>
-                                                <td>@stat.TotalRevenue</td>
-                                                <td>@stat.TimeDimension</td>
-                                                <td>
-                                                    <!-- Backend Note: Add functionality to open edit modal and link to SalesStatisticsController's Edit and Delete actions -->
-                                                    <button class="btn btn-warning mr-2" data-bs-toggle="modal" data-bs-target="#editSalesStatisticModal">Edit</button>
-                                                    <a class="btn btn-danger" href="#">Delete</a>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
+                <div class="modal-body">
+                    <form id="addUserForm" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="addUserName">Username</label>
+                                    <input type="text" class="form-control" id="addUserName" name="UserName" autocomplete="username" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="addPasswordHash">Password</label>
+                                    <input type="password" class="form-control" id="addPasswordHash" name="PasswordHash" autocomplete="new-password" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="addEmail">Email</label>
+                                    <input type="email" class="form-control" id="addEmail" name="Email" autocomplete="email" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="addPhoneNumber">Phone Number</label>
+                                    <input type="text" class="form-control" id="addPhoneNumber" name="PhoneNumber" autocomplete="tel" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="addFirstName">First Name</label>
+                                    <input type="text" class="form-control" id="addFirstName" name="FirstName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="addLastName">Last Name</label>
+                                    <input type="text" class="form-control" id="addLastName" name="LastName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="addAddress">Address</label>
+                                    <input type="text" class="form-control" id="addAddress" name="Address" autocomplete="street-address" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="addIsActive">Active</label>
+                                    <select class="form-control" id="addIsActive" name="IsActive" required>
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="addRoleId">Role ID</label>
+                                    <input type="number" class="form-control" id="addRoleId" name="RoleId" required>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save User</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editUserModalLabel">Edit User Role</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editUserForm" method="put">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" id="editUserIdField" name="id">
+                        <div class="form-group">
+                            <label for="editRoleIdField">New Role ID</label>
+                            <input type="number" class="form-control" id="editRoleIdField" name="newRoleId" required>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Update Role</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -463,44 +555,43 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Backend Note: Form submission should be handled by ProductController's CreateProductApi action -->
-                    <form id="addProductForm" asp-action="CreateProductApi" asp-controller="Product" method="post">
+                    <form id="addProductForm" method="post">
                         @Html.AntiForgeryToken()
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="productName">Product Name</label>
-                                    <input type="text" class="form-control" id="productName" name="ProductName" required>
+                                    <label for="addProductName">Product Name</label>
+                                    <input type="text" class="form-control" id="addProductName" name="ProductName" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="price">Price</label>
-                                    <input type="number" class="form-control" id="price" name="Price" step="0.01" required>
+                                    <label for="addPrice">Price</label>
+                                    <input type="number" class="form-control" id="addPrice" name="Price" step="0.01" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="stockQuantity">Stock Quantity</label>
-                                    <input type="number" class="form-control" id="stockQuantity" name="StockQuantity" required>
+                                    <label for="addStockQuantity">Stock Quantity</label>
+                                    <input type="number" class="form-control" id="addStockQuantity" name="StockQuantity" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="categoryId">Category ID</label>
-                                    <input type="number" class="form-control" id="categoryId" name="CategoryId" required>
+                                    <label for="addCategoryId">Category ID</label>
+                                    <input type="number" class="form-control" id="addCategoryId" name="CategoryId" required>
                                 </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="imageUrl">Image URL</label>
-                                    <input type="text" class="form-control" id="imageUrl" name="ImageUrl" required>
+                                    <label for="addImageUrl">Image URL</label>
+                                    <input type="text" class="form-control" id="addImageUrl" name="ImageUrl" required>
                                 </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="description">Description</label>
-                                    <textarea class="form-control" id="description" name="Description" rows="3" required></textarea>
+                                    <label for="addDescription">Description</label>
+                                    <textarea class="form-control" id="addDescription" name="Description" rows="3"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -523,216 +614,53 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Backend Note: Form submission should be handled by ProductController's UpdateProductApi action. Populate fields with existing product data using JavaScript or backend logic -->
-                    <form id="editProductForm" asp-action="UpdateProductApi" asp-controller="Product" method="post">
+                    <form id="editProductForm" method="put">
                         @Html.AntiForgeryToken()
-                        <input type="hidden" id="editProductId" name="ProductId">
+                        <input type="hidden" id="editProductIdField" name="ProductId">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="editProductName">Product Name</label>
-                                    <input type="text" class="form-control" id="editProductName" name="ProductName" required>
+                                    <label for="editProductNameField">Product Name</label>
+                                    <input type="text" class="form-control" id="editProductNameField" name="ProductName" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="editPrice">Price</label>
-                                    <input type="number" class="form-control" id="editPrice" name="Price" step="0.01" required>
+                                    <label for="editPriceField">Price</label>
+                                    <input type="number" class="form-control" id="editPriceField" name="Price" step="0.01" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="editStockQuantity">Stock Quantity</label>
-                                    <input type="number" class="form-control" id="editStockQuantity" name="StockQuantity" required>
+                                    <label for="editStockQuantityField">Stock Quantity</label>
+                                    <input type="number" class="form-control" id="editStockQuantityField" name="StockQuantity" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="editCategoryId">Category ID</label>
-                                    <input type="number" class="form-control" id="editCategoryId" name="CategoryId" required>
+                                    <label for="editCategoryIdField">Category ID</label>
+                                    <input type="number" class="form-control" id="editCategoryIdField" name="CategoryId" required>
                                 </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="editImageUrl">Image URL</label>
-                                    <input type="text" class="form-control" id="editImageUrl" name="ImageUrl" required>
+                                    <label for="editImageUrlField">Image URL</label>
+                                    <input type="text" class="form-control" id="editImageUrlField" name="ImageUrl" required>
                                 </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="editDescription">Description</label>
-                                    <textarea class="form-control" id="editDescription" name="Description" rows="3" required></textarea>
+                                    <label for="editDescriptionField">Description</label>
+                                    <textarea class="form-control" id="editDescriptionField" name="Description" rows="3"></textarea>
                                 </div>
                             </div>
+                            <!-- Hidden fields để giữ thông tin không chỉnh sửa -->
+                            <input type="hidden" id="editVendorIdField" name="VendorId">
+                            <input type="hidden" id="editCreatedDateField" name="CreatedDate">
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Update Product</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add User Modal -->
-    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Backend Note: Form submission should be handled by UserController's Create action -->
-                    <form id="addUserForm" asp-action="Create" asp-controller="User" method="post">
-                        @Html.AntiForgeryToken()
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="userName">Username</label>
-                                    <input type="text" class="form-control" id="userName" name="UserName" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="passwordHash">Password</label>
-                                    <input type="password" class="form-control" id="passwordHash" name="PasswordHash" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="email">Email</label>
-                                    <input type="email" class="form-control" id="email" name="Email" required>
-                                </div>
-                            </div>
-                            <ி
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="phoneNumber">Phone Number</label>
-                                    <input type="text" class="form-control" id="phoneNumber" name="PhoneNumber" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="firstName">First Name</label>
-                                    <input type="text" class="form-control" id="firstName" name="FirstName" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="lastName">Last Name</label>
-                                    <input type="text" class="form-control" id="lastName" name="LastName" required>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="address">Address</label>
-                                    <input type="text" class="form-control" id="address" name="Address" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="isActive">Active</label>
-                                    <select class="form-control" id="isActive" name="IsActive" required>
-                                        <option value="true">Yes</option>
-                                        <option value="false">No</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="roleId">Role ID</label>
-                                    <input type="number" class="form-control" id="roleId" name="RoleId" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save User</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit User Modal -->
-    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Backend Note: Form submission should be handled by UserController's UpdateUserRole action. Populate fields with existing user data -->
-                    <form id="editUserForm" asp-action="UpdateUserRole" asp-controller="User" method="post">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" id="editUserId" name="id">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="editUserName">Username</label>
-                                    <input type="text" class="form-control" id="editUserName" name="UserName" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="editPasswordHash">Password</label>
-                                    <input type="password" class="form-control" id="editPasswordHash" name="PasswordHash" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="editEmail">Email</label>
-                                    <input type="email" class="form-control" id="editEmail" name="Email" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="editPhoneNumber">Phone Number</label>
-                                    <input type="text" class="form-control" id="editPhoneNumber" name="PhoneNumber" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="editFirstName">First Name</label>
-                                    <input type="text" class="form-control" id="editFirstName" name="FirstName" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="editLastName">Last Name</label>
-                                    <input type="text" class="form-control" id="editLastName" name="LastName" required>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="editAddress">Address</label>
-                                    <input type="text" class="form-control" id="editAddress" name="Address" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="editIsActive">Active</label>
-                                    <select class="form-control" id="editIsActive" name="IsActive" required>
-                                        <option value="true">Yes</option>
-                                        <option value="false">No</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="editRoleId">Role ID</label>
-                                    <input type="number" class="form-control" id="editRoleId" name="newRoleId" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Update User</button>
                         </div>
                     </form>
                 </div>
@@ -749,44 +677,43 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Backend Note: Form submission should be handled by SalesStatisticsController's Create action -->
                     <form id="addSalesStatisticForm" asp-action="Create" asp-controller="SalesStatistics" method="post">
                         @Html.AntiForgeryToken()
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="reportDate">Report Date</label>
-                                    <input type="date" class="form-control" id="reportDate" name="ReportDate" required>
+                                    <label for="addReportDate">Report Date</label>
+                                    <input type="date" class="form-control" id="addReportDate" name="ReportDate" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="productId">Product ID</label>
-                                    <input type="number" class="form-control" id="productId" name="ProductId" required>
+                                    <label for="addProductId">Product ID</label>
+                                    <input type="number" class="form-control" id="addProductId" name="ProductId" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="categoryId">Category ID</label>
-                                    <input type="number" class="form-control" id="categoryId" name="CategoryId" required>
+                                    <label for="addCategoryId">Category ID</label>
+                                    <input type="number" class="form-control" id="addCategoryId" name="CategoryId" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="totalQuantitySold">Total Quantity Sold</label>
-                                    <input type="number" class="form-control" id="totalQuantitySold" name="TotalQuantitySold" required>
+                                    <label for="addTotalQuantitySold">Total Quantity Sold</label>
+                                    <input type="number" class="form-control" id="addTotalQuantitySold" name="TotalQuantitySold" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="totalRevenue">Total Revenue</label>
-                                    <input type="number" class="form-control" id="totalRevenue" name="TotalRevenue" step="0.01" required>
+                                    <label for="addTotalRevenue">Total Revenue</label>
+                                    <input type="number" class="form-control" id="addTotalRevenue" name="TotalRevenue" step="0.01" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="timeDimension">Time Dimension</label>
-                                    <select class="form-control" id="timeDimension" name="TimeDimension" required>
+                                    <label for="addTimeDimension">Time Dimension</label>
+                                    <select class="form-control" id="addTimeDimension" name="TimeDimension" required>
                                         <option value="Daily">Daily</option>
                                         <option value="Weekly">Weekly</option>
                                         <option value="Monthly">Monthly</option>
@@ -814,7 +741,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Backend Note: Form submission should be handled by SalesStatisticsController's Edit action. Populate fields with existing statistic data -->
                     <form id="editSalesStatisticForm" asp-action="Edit" asp-controller="SalesStatistics" method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" id="editStatisticId" name="StatisticId">
@@ -871,17 +797,288 @@
         </div>
     </div>
 
-    <!-- JavaScript Libraries for Bootstrap -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+
+    <!-- Custom JavaScript -->
     <script>
         $(document).ready(function () {
+            // Chuyển đổi tab
             $('.nav-link').on('click', function () {
                 var target = $(this).data('tab');
                 $('.tab-pane').removeClass('show active');
                 $('.nav-link').removeClass('active');
                 $('#' + target).addClass('show active');
                 $(this).addClass('active');
+            });
+
+            // Tải danh sách người dùng từ API
+            $.ajax({
+                url: '/api/User',
+                method: 'GET',
+                success: function (users) {
+                    var tbody = $('#userTable tbody');
+                    tbody.empty();
+                    if (users && users.length > 0) {
+                        users.forEach(function (user) {
+                            var row = `
+                                <tr>
+                                    <td>${user.userId || ''}</td>
+                                    <td>${user.userName || ''}</td>
+                                    <td>${user.email || ''}</td>
+                                    <td>${user.firstName || ''}</td>
+                                    <td>${user.lastName || ''}</td>
+                                    <td>${user.phoneNumber || ''}</td>
+                                    <td>${user.address || ''}</td>
+                                    <td>${user.isActive ? 'Yes' : 'No'}</td>
+                                    <td>${user.roleId || ''}</td>
+                                    <td>
+                                        <button class="btn btn-warning mr-2 edit-user" data-id="${user.userId}">Edit</button>
+                                        <button class="btn btn-danger delete-user" data-id="${user.userId}">Delete</button>
+                                    </td>
+                                </tr>`;
+                            tbody.append(row);
+                        });
+                    } else {
+                        tbody.append('<tr><td colspan="10">No users found</td></tr>');
+                    }
+                },
+                error: function (xhr) {
+                    console.error('Error loading users:', xhr.status, xhr.statusText, xhr.responseText);
+                    var errorMessage = xhr.status === 404
+                        ? 'Error 404: User API not found on this server.'
+                        : `Error ${xhr.status}: ${xhr.statusText} - ${xhr.responseText}`;
+                    $('#userTable tbody').html(`<tr><td colspan="10">${errorMessage}</td></tr>`);
+                }
+            });
+
+            // Tải danh sách sản phẩm từ API
+            $.ajax({
+                url: '/api/products',
+                method: 'GET',
+                success: function (products) {
+                    var tbody = $('#productTable tbody');
+                    tbody.empty();
+                    if (products && products.length > 0) {
+                        products.forEach(function (product) {
+                            var row = `
+                                <tr>
+                                    <td>${product.productId || ''}</td>
+                                    <td>${product.productName || ''}</td>
+                                    <td>${product.description || ''}</td>
+                                    <td>${product.price || ''}</td>
+                                    <td>${product.stockQuantity || ''}</td>
+                                    <td>${product.imageUrl || ''}</td>
+                                    <td>${product.categoryId || ''}</td>
+                                    <td>${product.vendorId || ''}</td>
+                                    <td>${product.createdDate ? new Date(product.createdDate).toISOString().split('T')[0] : ''}</td>
+                                    <td>${product.updatedDate ? new Date(product.updatedDate).toISOString().split('T')[0] : ''}</td>
+                                    <td>
+                                        <button class="btn btn-warning mr-2 edit-product" data-id="${product.productId}">Edit</button>
+                                        <button class="btn btn-danger delete-product" data-id="${product.productId}">Delete</button>
+                                    </td>
+                                </tr>`;
+                            tbody.append(row);
+                        });
+                    } else {
+                        tbody.append('<tr><td colspan="11">No products found</td></tr>');
+                    }
+                },
+                error: function (xhr) {
+                    console.error('Error loading products:', xhr.status, xhr.statusText, xhr.responseText);
+                    var errorMessage = xhr.status === 404
+                        ? 'Error 404: Products API not found on this server.'
+                        : `Error ${xhr.status}: ${xhr.statusText} - ${xhr.responseText}`;
+                    $('#productTable tbody').html(`<tr><td colspan="11">${errorMessage}</td></tr>`);
+                }
+            });
+
+            // Xử lý form thêm người dùng
+            $('#addUserForm').on('submit', function (e) {
+                e.preventDefault();
+                var formData = $(this).serializeArray();
+                var userData = {};
+                formData.forEach(function (item) {
+                    if (item.name === 'RoleId') {
+                        userData[item.name] = parseInt(item.value);
+                    } else if (item.name === 'IsActive') {
+                        userData[item.name] = item.value === 'true';
+                    } else {
+                        userData[item.name] = item.value;
+                    }
+                });
+
+                $.ajax({
+                    url: '/api/Auth/api/register',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(userData),
+                    success: function () {
+                        $('#addUserModal').modal('hide');
+                        location.reload();
+                    },
+                    error: function (xhr) {
+                        alert('Error adding user: ' + xhr.statusText + ' - ' + xhr.responseText);
+                    }
+                });
+            });
+
+            // Xử lý nút Edit User
+            $('#userTable').on('click', '.edit-user', function () {
+                var userId = $(this).data('id');
+                $.ajax({
+                    url: `/api/User/${userId}`,
+                    method: 'GET',
+                    success: function (user) {
+                        $('#editUserIdField').val(user.userId);
+                        $('#editRoleIdField').val(user.roleId);
+                        $('#editUserModal').modal('show');
+                    },
+                    error: function (xhr) {
+                        alert('Error loading user: ' + xhr.statusText + ' - ' + xhr.responseText);
+                    }
+                });
+            });
+
+            // Xử lý form chỉnh sửa Role
+            $('#editUserForm').on('submit', function (e) {
+                e.preventDefault();
+                var userId = $('#editUserIdField').val();
+                var newRoleId = parseInt($('#editRoleIdField').val());
+
+                $.ajax({
+                    url: `/api/User/${userId}/role`,
+                    method: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(newRoleId),
+                    success: function () {
+                        $('#editUserModal').modal('hide');
+                        location.reload();
+                    },
+                    error: function (xhr) {
+                        alert('Error updating role: ' + xhr.statusText + ' - ' + xhr.responseText);
+                    }
+                });
+            });
+
+            // Xử lý nút Delete User
+            $('#userTable').on('click', '.delete-user', function () {
+                var userId = $(this).data('id');
+                if (confirm('Are you sure you want to delete this user?')) {
+                    $.ajax({
+                        url: `/api/User/Delete/${userId}`,
+                        method: 'DELETE',
+                        success: function () {
+                            location.reload();
+                        },
+                        error: function (xhr) {
+                            alert('Error deleting user: ' + xhr.statusText + ' - ' + xhr.responseText);
+                        }
+                    });
+                }
+            });
+
+            // Xử lý form thêm sản phẩm
+            $('#addProductForm').on('submit', function (e) {
+                e.preventDefault();
+                var formData = $(this).serializeArray();
+                var productData = {};
+                formData.forEach(function (item) {
+                    if (item.name === 'Price') {
+                        productData[item.name] = parseFloat(item.value);
+                    } else if (item.name === 'StockQuantity' || item.name === 'CategoryId') {
+                        productData[item.name] = parseInt(item.value);
+                    } else {
+                        productData[item.name] = item.value || null;
+                    }
+                });
+
+                $.ajax({
+                    url: '/api/products',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(productData),
+                    success: function () {
+                        $('#addProductModal').modal('hide');
+                        location.reload();
+                    },
+                    error: function (xhr) {
+                        alert('Error adding product: ' + xhr.statusText + ' - ' + xhr.responseText);
+                    }
+                });
+            });
+
+            // Xử lý nút Edit Product
+            $('#productTable').on('click', '.edit-product', function () {
+                var productId = $(this).data('id');
+                $.ajax({
+                    url: `/api/products/${productId}`,
+                    method: 'GET',
+                    success: function (product) {
+                        $('#editProductIdField').val(product.productId);
+                        $('#editProductNameField').val(product.productName);
+                        $('#editPriceField').val(product.price);
+                        $('#editStockQuantityField').val(product.stockQuantity);
+                        $('#editCategoryIdField').val(product.categoryId);
+                        $('#editImageUrlField').val(product.imageUrl);
+                        $('#editDescriptionField').val(product.description);
+                        $('#editVendorIdField').val(product.vendorId);
+                        $('#editCreatedDateField').val(product.createdDate ? new Date(product.createdDate).toISOString().split('T')[0] : '');
+                        $('#editProductModal').modal('show');
+                    },
+                    error: function (xhr) {
+                        alert('Error loading product: ' + xhr.statusText + ' - ' + xhr.responseText);
+                    }
+                });
+            });
+
+            // Xử lý form chỉnh sửa sản phẩm
+            $('#editProductForm').on('submit', function (e) {
+                e.preventDefault();
+                var productId = $('#editProductIdField').val();
+                var formData = $(this).serializeArray();
+                var productData = { ProductId: parseInt(productId) };
+                formData.forEach(function (item) {
+                    if (item.name === 'Price') {
+                        productData[item.name] = parseFloat(item.value);
+                    } else if (item.name === 'StockQuantity' || item.name === 'CategoryId' || item.name === 'VendorId') {
+                        productData[item.name] = parseInt(item.value);
+                    } else {
+                        productData[item.name] = item.value || null;
+                    }
+                });
+
+                $.ajax({
+                    url: `/api/products/${productId}`,
+                    method: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(productData),
+                    success: function () {
+                        $('#editProductModal').modal('hide');
+                        location.reload();
+                    },
+                    error: function (xhr) {
+                        alert('Error updating product: ' + xhr.statusText + ' - ' + xhr.responseText);
+                    }
+                });
+            });
+
+            // Xử lý nút Delete Product
+            $('#productTable').on('click', '.delete-product', function () {
+                var productId = $(this).data('id');
+                if (confirm('Are you sure you want to delete this product?')) {
+                    $.ajax({
+                        url: `/api/products/${productId}`,
+                        method: 'DELETE',
+                        success: function () {
+                            location.reload();
+                        },
+                        error: function (xhr) {
+                            alert('Error deleting product: ' + xhr.statusText + ' - ' + xhr.responseText);
+                        }
+                    });
+                }
             });
         });
     </script>

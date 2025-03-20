@@ -90,19 +90,8 @@ namespace Project_PRN222.Controllers
                 var principal = new ClaimsPrincipal(identity);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-                // Chuyển hướng dựa trên RoleId
-                if (user.RoleId == 1) // ADMIN
-                {
-                    return RedirectToAction("AdminDashboard", "Home");
-                }
-                else if (user.RoleId == 2) // VENDOR
-                {
-                    return RedirectToAction("VendorDashboard", "Home");
-                }
-                else // RoleId = 3 hoặc các role khác (khách hàng thông thường)
-                {
-                    return RedirectToAction("Index", "Home");
-                }
+                // Chuyển hướng tất cả vai trò về Home/Index
+                return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {
