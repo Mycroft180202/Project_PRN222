@@ -24,7 +24,7 @@ namespace Project_PRN222.Controllers
         }
 
         [HttpPost("add")]
-        [RoleAuthorize(1, 2, 3)]
+        //[RoleAuthorize(1, 2, 3)]
         public async Task<IActionResult> AddToCart(int productId, int quantity)
         {
             try
@@ -39,7 +39,7 @@ namespace Project_PRN222.Controllers
         }
 
         [HttpGet]
-        [RoleAuthorize(1, 2, 3)]
+        //[RoleAuthorize(1, 2, 3)]
         public async Task<IActionResult> GetCartItems()
         {
             try
@@ -54,7 +54,7 @@ namespace Project_PRN222.Controllers
         }
 
         [HttpPut("{cartItemId}")]
-        [RoleAuthorize(1, 2, 3)]
+        //[RoleAuthorize(1, 2, 3)]
         public async Task<IActionResult> UpdateCartItem(int cartItemId, [FromBody] int quantity)
         {
             try
@@ -69,7 +69,7 @@ namespace Project_PRN222.Controllers
         }
 
         [HttpDelete("{cartItemId}")]
-        [RoleAuthorize(1, 2, 3)]
+        //[RoleAuthorize(1, 2, 3)]
         public async Task<IActionResult> RemoveFromCart(int cartItemId)
         {
             try

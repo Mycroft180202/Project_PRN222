@@ -403,7 +403,6 @@
                         <div class="d-flex flex-column justify-content-start">
                             <a class="text-dark mb-2" href="@Url.Action("Index", "Home")"><i class="fa fa-angle-right mr-2"></i>Home</a>
                             <a class="text-dark mb-2" href="@Url.Action("Index", "Product")"><i class="fa fa-angle-right mr-2"></i>Our Shop</a>
-                            <a class="text-dark mb-2" href="@Url.Action("Detail", "Product")"><i class="fa fa-angle-right mr-2"></i>Shop Detail</a>
                             <a class="text-dark mb-2" href="/Cart/Cart"><i class="fa fa-angle-right mr-2"></i>Shopping Cart</a>
                             <a class="text-dark mb-2" href="@Url.Action("Checkout", "Home")"><i class="fa fa-angle-right mr-2"></i>Checkout</a>
                             <a class="text-dark" href="@Url.Action("Contact", "Home")"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
@@ -414,7 +413,6 @@
                         <div class="d-flex flex-column justify-content-start">
                             <a class="text-dark mb-2" href="@Url.Action("Index", "Home")"><i class="fa fa-angle-right mr-2"></i>Home</a>
                             <a class="text-dark mb-2" href="@Url.Action("Index", "Product")"><i class="fa fa-angle-right mr-2"></i>Our Shop</a>
-                            <a class="text-dark mb-2" href="@Url.Action("Detail", "Product")"><i class="fa fa-angle-right mr-2"></i>Shop Detail</a>
                             <a class="text-dark mb-2" href="/Cart/Cart"><i class="fa fa-angle-right mr-2"></i>Shopping Cart</a>
                             <a class="text-dark mb-2" href="@Url.Action("Checkout", "Home")"><i class="fa fa-angle-right mr-2"></i>Checkout</a>
                             <a class="text-dark" href="@Url.Action("Contact", "Home")"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
@@ -472,21 +470,45 @@
             $('.add-to-cart').click(function (e) {
                 e.preventDefault();
                 var productId = $(this).data('product-id');
-                var quantity = $('#quantityInput').val();
+                var quantityInput = $('#quantityInput');
+                var quantity = parseInt(quantityInput.val());
 
+                // Log giá trị để debug
+                console.log('Product ID:', productId);
+                console.log('Quantity:', quantity);
+
+                // Kiểm tra giá trị hợp lệ
+                if (isNaN(quantity) || quantity <= 0) {
+                    alert('Please enter a valid quantity (minimum 1).');
+                    return;
+                }
+                if (!productId || productId <= 0 || isNaN(productId)) {
+                    alert('Invalid product ID.');
+                    return;
+                }
+
+                // Gửi yêu cầu dưới dạng JSON
                 $.ajax({
                     url: '/api/cart/add',
                     type: 'POST',
-                    data: {
-                        productId: productId,
-                        quantity: quantity
-                    },
+                    contentType: 'application/json',
+                    data: JSON.stringify({ productId: productId, quantity: quantity }),
                     success: function (response) {
                         alert(response.Message || 'Product added to cart successfully!');
                         updateCartBadge();
                     },
                     error: function (xhr) {
-                        alert('Error adding product: ' + (xhr.responseJSON?.Message || 'Unknown error'));
+                        // Xử lý lỗi chi tiết
+                        var errorMessage = xhr.responseJSON?.message || 'Unknown error';
+                        console.log('Error Response:', xhr.responseText); // Log phản hồi chi tiết
+                        if (xhr.status === 400) {
+                            alert('Error adding product: ' + errorMessage + '\nThis may be due to a database issue (e.g., User ID not found in Users table or a constraint violation). Please ensure your User ID exists in the Users table and contact support with the following details:\n- Product ID: ' + productId + '\n- Quantity: ' + quantity);
+                        } else if (xhr.status === 403 || xhr.status === 401) {
+                            alert('Please log in to add products to your cart.');
+                            window.location.href = '@Url.Action("Login", "Auth")';
+                        } else {
+                            alert('Error adding product: ' + errorMessage + ' (Status: ' + xhr.status + ')');
+                        }
                     }
                 });
             });
@@ -502,7 +524,7 @@
             }
 
             function updateCartBadge() {
-                $.get('/api/cart/cart', function (data) {
+                $.get('/api/cart', function (data) {
                     var itemCount = data.length || 0;
                     $('#cartBadge').text(itemCount);
                 }).fail(function () {

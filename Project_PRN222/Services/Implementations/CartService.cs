@@ -25,13 +25,12 @@ namespace Project_PRN222.Services.Implementations
             }
             return userId;
         }
-
         public async Task AddToCart(int productId, int quantity)
         {
             var userId = GetCurrentUserId();
             if (userId == null)
             {
-                throw new Exception("User not logged in."); // Giữ nguyên ngoại lệ cho API
+                throw new Exception("User not logged in.");
             }
 
             var existingItem = await _cartRepository.GetByUserIdAndProductId(userId.Value, productId);
