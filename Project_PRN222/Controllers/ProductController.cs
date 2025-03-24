@@ -19,21 +19,7 @@ namespace Project_PRN222.Controllers
         public IActionResult Index()
         {
             var products = _productService.GetAllProducts();
-            return View(products);
-        }
-
-        // Hiển thị chi tiết sản phẩm
-        [HttpGet("Detail/{id}")]
-        public IActionResult Detail(int id)
-        {
-            var product = _productService.GetProductById(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-            // Bỏ phần gọi GetRelatedProducts để tránh lỗi
-            ViewBag.RelatedProducts = new List<Product>(); // Truyền danh sách rỗng để tránh lỗi trong view
-            return View(product);
+            return View(products); // Assuming you have an Index.cshtml in Views/Product to display products
         }
 
         [HttpGet("api/products")]
@@ -83,13 +69,15 @@ namespace Project_PRN222.Controllers
         }
 
         // Action to return Create Product View (Admin, Vendor)
-        [HttpGet("Product/CreateView")]
+        [HttpGet("CreateView")]
+        [RoleAuthorize(1, 2)]
         public IActionResult Create()
         {
-            return View("CreateView");
+            return View("Create"); // Assuming you have a Create.cshtml in Views/Product for creating products
         }
 
         [HttpPost("api/products")]
+        [RoleAuthorize(1, 2)]
         public IActionResult CreateProductApi([FromBody] Product product)
         {
             if (product == null)
@@ -131,6 +119,7 @@ namespace Project_PRN222.Controllers
 
         // Action to return Edit Product View (Admin, Vendor)
         [HttpGet("EditView/{id}")]
+        [RoleAuthorize(1, 2)]
         public IActionResult EditView(int id)
         {
             var product = _productService.GetProductById(id);
@@ -138,55 +127,35 @@ namespace Project_PRN222.Controllers
             {
                 return NotFound();
             }
-            return View("Edit", product);
+            return View("Edit", product); // Assuming you have an Edit.cshtml in Views/Product for editing products, passing the product model
         }
+
 
         // Chỉ Admin và Vendor (nếu sở hữu sản phẩm) được sửa
         [HttpPut("api/products/{id}")]
-public IActionResult UpdateProductApi(int id, [FromBody] Product product)
-{
-    try
-    {
-        if (id != product.ProductId)
+        [RoleAuthorize(1, 2)]
+        public IActionResult UpdateProductApi(int id, [FromBody] Product product)
         {
-            return BadRequest("ID in request path and body do not match.");
+            if (id != product.ProductId)
+            {
+                return BadRequest("ID in request path and body do not match.");
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var existingProduct = _productService.GetProductById(id);
+            if (existingProduct == null)
+            {
+                return NotFound();
+            }
+            _productService.UpdateProduct(product);
+            return NoContent();
         }
-
-        if (!ModelState.IsValid)
-        {
-            var errors = ModelState.SelectMany(x => x.Value.Errors).Select(x => x.ErrorMessage);
-            return BadRequest(new { Errors = errors });
-        }
-
-        var existingProduct = _productService.GetProductById(id);
-        if (existingProduct == null)
-        {
-            return NotFound();
-        }
-
-        // Cập nhật các trường cần thiết
-        existingProduct.ProductName = product.ProductName;
-        existingProduct.Description = product.Description;
-        existingProduct.Price = product.Price;
-        existingProduct.StockQuantity = product.StockQuantity;
-        existingProduct.ImageUrl = product.ImageUrl;
-        existingProduct.CategoryId = product.CategoryId;
-        existingProduct.VendorId = product.VendorId; // Giữ nguyên nếu có quyền chỉnh sửa
-        existingProduct.UpdatedDate = DateTime.Now; // Cập nhật thời gian chỉnh sửa
-
-        _productService.UpdateProduct(existingProduct);
-        return NoContent();
-    }
-    catch (Exception ex)
-    {
-        // Log lỗi để debug
-        Console.WriteLine($"Error updating product: {ex.Message}");
-        return StatusCode(500, "An error occurred while updating the product.");
-    }
-}
 
         // Action to return Delete Product Confirmation View (Admin, Vendor) - Optional
         [HttpGet("DeleteConfirmationView/{id}")]
+        [RoleAuthorize(1, 2)]
         public IActionResult DeleteConfirmationView(int id)
         {
             var product = _productService.GetProductById(id);
@@ -194,11 +163,13 @@ public IActionResult UpdateProductApi(int id, [FromBody] Product product)
             {
                 return NotFound();
             }
-            return View("DeleteConfirmation", product);
+            return View("DeleteConfirmation", product); // Assuming you have a DeleteConfirmation.cshtml in Views/Product
         }
+
 
         // Chỉ Admin và Vendor (nếu sở hữu sản phẩm) được xóa
         [HttpDelete("api/products/{id}")]
+        [RoleAuthorize(1, 2)]
         public IActionResult DeleteProductApi(int id)
         {
             var product = _productService.GetProductById(id);

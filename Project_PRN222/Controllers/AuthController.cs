@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.SignalR;
 using Project_PRN222.DTO;
 using Project_PRN222.Hubs;
 using Project_PRN222.Services.Interfaces;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace Project_PRN222.Controllers
 {
@@ -42,23 +38,13 @@ namespace Project_PRN222.Controllers
                 }
 
                 var user = await _authService.Register(registerDto);
-                // Đăng nhập ngay sau khi đăng ký
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim("RoleId", user.RoleId.ToString())
-                };
-                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var principal = new ClaimsPrincipal(identity);
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-
-                await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Registration successful", "success");
+                await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Registration successful");
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {
                 TempData["Error"] = ex.Message; // Lưu lỗi vào TempData
-                await _hubContext.Clients.All.SendAsync("ReceiveMessage", $"Error: {ex.Message}", "error");
+                await _hubContext.Clients.All.SendAsync("ReceiveMessage", $"Error: {ex.Message}");
                 return View("Register", registerDto); // Trả về View với dữ liệu đã nhập
             }
         }
@@ -80,31 +66,24 @@ namespace Project_PRN222.Controllers
                 }
 
                 var user = await _authService.Login(loginDto);
-                // Lưu thông tin người dùng vào claims
-                var claims = new List<Claim>
+                if (user.RoleId == 1)
                 {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim("RoleId", user.RoleId.ToString())
-                };
-                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var principal = new ClaimsPrincipal(identity);
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-
-                // Chuyển hướng tất cả vai trò về Home/Index
-                return RedirectToAction("Index", "Home");
+                    return RedirectToAction("AdminDashboard", "Home");
+                }
+                else if (user.RoleId == 2)
+                {
+                    return RedirectToAction("VendorDashboard", "Home");
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Home");
+                }
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = ex.Message; // Lưu lỗi vào ViewBag
+                TempData["Error"] = ex.Message; // Lưu lỗi vào TempData
                 return View("Login", loginDto); // Trả về View với dữ liệu đã nhập
             }
-        }
-
-        [HttpPost("logout")]
-        public async Task<IActionResult> Logout()
-        {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet("forgot-password")]
