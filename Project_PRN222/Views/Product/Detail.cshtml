@@ -112,13 +112,13 @@
             <div class="d-flex align-items-center mb-4 pt-2">
                 <div class="input-group quantity mr-3" style="width: 130px;">
                     <div class="input-group-btn">
-                        <button class="btn btn-primary btn-minus" onclick="updateQuantity(-1)">
+                        <button type="button" class="btn btn-primary btn-minus">
                             <i class="fa fa-minus"></i>
                         </button>
                     </div>
                     <input type="text" id="quantityInput" class="form-control bg-secondary text-center" value="1">
                     <div class="input-group-btn">
-                        <button class="btn btn-primary btn-plus" onclick="updateQuantity(1)">
+                        <button type="button" class="btn btn-primary btn-plus">
                             <i class="fa fa-plus"></i>
                         </button>
                     </div>
@@ -327,15 +327,7 @@
             });
         });
 
-        //function updateQuantity(change) {
-        //    var quantityInput = $('#quantityInput');
-        //    var currentQuantity = parseInt(quantityInput.val());
-        //    var newQuantity = currentQuantity + change;
-
-        //    if (newQuantity < 1) newQuantity = 1;
-        //   if (newQuantity > @Model.StockQuantity) newQuantity = @Model.StockQuantity; // Giới hạn theo StockQuantity
-        //    quantityInput.val(newQuantity);
-        //}
+       
 
         function updateCartBadge() {
             $.get('/api/cart', function (data) {
@@ -371,16 +363,34 @@
                 }
             }
         });
+        $('.btn-plus').off('click').on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            updateQuantity(1);
+            return false;
+        });
+
+        $('.btn-minus').off('click').on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            updateQuantity(-1);
+            return false;
+        });
     });
 
     // Expose updateQuantity function to global scope for button clicks
     window.updateQuantity = function(change) {
+        console.log('updateQuantity called with change:', change); // Debug log
+
         var quantityInput = $('#quantityInput');
         var currentQuantity = parseInt(quantityInput.val());
         var newQuantity = currentQuantity + change;
 
         if (newQuantity < 1) newQuantity = 1;
         if (newQuantity > @Model.StockQuantity) newQuantity = @Model.StockQuantity;
+
+        console.log('Current quantity:', currentQuantity, 'New quantity:', newQuantity); // Debug log
+
         quantityInput.val(newQuantity);
     }
 </script>

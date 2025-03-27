@@ -231,10 +231,7 @@
                 
                 <form id="profileForm" asp-action="UpdateMyProfile" asp-controller="User" method="put">
                     @Html.AntiForgeryToken()
-                    <div class="form-group">
-                        <label><i class="fas fa-id-badge mr-2"></i> User ID</label>
-                        <input class="form-control" readonly value="@Model.UserId" />
-                    </div>
+                    <input type="hidden" id="userId" name="UserId" value="@Model.UserId" />
                     <div class="form-group">
                         <label><i class="fas fa-user-tag mr-2"></i> Username</label>
                         <input class="form-control" readonly value="@Model.UserName" />

@@ -11,15 +11,18 @@ namespace Project_PRN222.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly ICategoryService _categoryService;
         private readonly IProductService _productService;
+        private readonly IOrderService _orderService;
 
         public HomeController(
             ILogger<HomeController> logger,
             ICategoryService categoryService,
-            IProductService productService)
+            IProductService productService,
+            IOrderService orderService)
         {
             _logger = logger;
             _categoryService = categoryService;
             _productService = productService;
+            _orderService = orderService;
         }
 
         public IActionResult Index()
@@ -54,7 +57,6 @@ namespace Project_PRN222.Controllers
             return View("VendorDashboard"); // Assuming you have VendorDashboard.cshtml in Views/Home
         }
 
-
         public IActionResult Privacy()
         {
             return View(); // Returns Views/Home/Privacy.cshtml
@@ -65,5 +67,7 @@ namespace Project_PRN222.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier }); // Returns Views/Home/Error.cshtml
         }
+
+        
     }
 }

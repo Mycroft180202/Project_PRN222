@@ -1,4 +1,5 @@
 ﻿@model Project_PRN222.Models.HomeViewModel
+
 @{
     ViewData["Title"] = "Home Page";
     Layout = null; // Tắt layout mặc định
@@ -67,50 +68,27 @@
         <!-- Nội dung trang chủ hiện tại -->
         <!-- Topbar Start -->
         @await Html.PartialAsync("_Header")
-        <!-- Navbar Start -->
+        <!-- Banner Start -->
         <div class="container-fluid mb-5">
             <div class="row border-top px-xl-5">
-                
+               
+        
                 <div class="col-lg-9">
-                    
-                    <div id="header-carousel" class="carousel slide" data-ride="carousel">
-                        <div class="carousel-inner">
-                            <div class="carousel-item active" style="height: 410px;">
-                                <img class="img-fluid" src="~/img/carousel-1.jpg" alt="Image">
-                                <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                                    <div class="p-3" style="max-width: 700px;">
-                                        <h4 class="text-light text-uppercase font-weight-medium mb-3">10% Off Your First Order</h4>
-                                        <h3 class="display-4 text-white font-weight-semi-bold mb-4">Traditional Handicrafts</h3>
-                                        <a href="@Url.Action("Shop", "Home")" class="btn btn-light py-2 px-3">Shop Now</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="carousel-item" style="height: 410px;">
-                                <img class="img-fluid" src="~/img/carousel-2.jpg" alt="Image">
-                                <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                                    <div class="p-3" style="max-width: 700px;">
-                                        <h4 class="text-light text-uppercase font-weight-medium mb-3">10% Off Your First Order</h4>
-                                        <h3 class="display-4 text-white font-weight-semi-bold mb-4">Authentic Quality</h3>
-                                        <a href="@Url.Action("Shop", "Home")" class="btn btn-light py-2 px-3">Shop Now</a>
-                                    </div>
-                                </div>
+                    <!-- Static Banner Image -->
+                    <div class="position-relative" style="height: 410px;">
+                        <img class="img-fluid w-100 h-100 object-cover" src="~/img/carousel-1.jpg" alt="Banner Image" style="object-fit: cover;">
+                        <div class="position-absolute d-flex flex-column align-items-center justify-content-center" style="top: 0; left: 0; right: 0; bottom: 0;">
+                            <div class="p-3 text-center" style="max-width: 700px;">
+                                <h4 class="text-light text-uppercase font-weight-medium mb-3">10% Off Your First Order</h4>
+                                <h3 class="display-4 text-white font-weight-semi-bold mb-4">Traditional Handicrafts</h3>
+                                <a href="@Url.Action("Index", "Product")" class="btn btn-light py-2 px-3">Shop Now</a>
                             </div>
                         </div>
-                        <a class="carousel-control-prev" href="#header-carousel" data-slide="prev">
-                            <div class="btn btn-dark" style="width: 45px; height: 45px;">
-                                <span class="carousel-control-prev-icon mb-n2"></span>
-                            </div>
-                        </a>
-                        <a class="carousel-control-next" href="#header-carousel" data-slide="next">
-                            <div class="btn btn-dark" style="width: 45px; height: 45px;">
-                                <span class="carousel-control-next-icon mb-n2"></span>
-                            </div>
-                        </a>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Navbar End -->
+        <!-- Banner End -->
         <!-- Toast Container -->
         <div aria-live="polite" aria-atomic="true" style="position: relative;">
             <div style="position: fixed; top: 20px; right: 20px; z-index: 1050;">
@@ -221,10 +199,9 @@
                                     <h6>$@product.Price.ToString("0.00")</h6>
                                 </div>
                             </div>
-                            <div class="card-footer d-flex justify-content-between bg-light border">
-                                <a href="@Url.Action("Detail", "Product", new { id = product.ProductId })" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a>
-                                <a href="#" class="btn btn-sm text-dark p-0 add-to-cart" data-product-id="@product.ProductId"><i class="fas fa-shopping-cart text-primary mr-1"></i>Add To Cart</a>
-                            </div>
+                            <button class="btn btn-primary px-3 add-to-cart" data-product-id="@product.ProductId" >
+                                <i class="fa fa-shopping-cart mr-1"></i> Add To Cart
+                            </button>
                         </div>
                     </div>
                 }
@@ -336,6 +313,7 @@
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
     <script src="~/lib/easing/easing.min.js"></script>
     <script src="~/lib/owlcarousel/owl.carousel.min.js"></script>
 
@@ -345,10 +323,11 @@
 
     <!-- Template Javascript -->
     <script src="~/js/main.js"></script>
+    
 
    
         <script>
-            // Tạm thời bỏ qua SignalR để tránh lỗi
+            
             const connection = new signalR.HubConnectionBuilder()
                 .withUrl("/notificationHub")
                 .build();
@@ -373,6 +352,136 @@
 
             connection.start().catch(function (err) {
                 console.error(err.toString());
+            });
+            $(document).ready(function() {
+                // Make sure the category dropdown works
+                $('#navbar-vertical').on('show.bs.collapse', function () {
+                    $(this).addClass('show');
+                });
+
+                // Fix for category links
+                $('.navbar-nav .nav-link').on('click', function(e) {
+                    if ($(this).attr('data-toggle') === 'dropdown') {
+                        e.preventDefault();
+                        $(this).next('.dropdown-menu').toggleClass('show');
+                    }
+                });
+
+                // Close dropdown when clicking outside
+                $(document).on('click', function(e) {
+                    if (!$(e.target).closest('.nav-item.dropdown').length) {
+                        $('.dropdown-menu').removeClass('show');
+                    }
+                });
+            });
+            $(document).ready(function() {
+                
+                $('.btn[href="#navbar-vertical"]').on('click', function(e) {
+                    e.preventDefault();
+                    $('#navbar-vertical').toggleClass('show');
+                });
+
+               
+                $('.navbar-nav .nav-link[data-toggle="dropdown"]').on('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    $(this).next('.dropdown-menu').toggleClass('show');
+                });
+
+                
+                $(document).on('click', function(e) {
+                    if (!$(e.target).closest('#navbar-vertical, .btn[href="#navbar-vertical"]').length) {
+                        $('#navbar-vertical').removeClass('show');
+                    }
+
+                    if (!$(e.target).closest('.nav-item.dropdown').length) {
+                        $('.dropdown-menu').removeClass('show');
+                    }
+                });
+            });
+            $(document).ready(function () {
+                $('.add-to-cart').click(function (e) {
+                    e.preventDefault();
+                    var productId = $(this).data('product-id');
+                    var quantityInput = $('#quantityInput');
+                    var quantity = 1;
+
+                    // Log giá trị để debug
+                    console.log('Product ID:', productId);
+                    console.log('Quantity:', quantity);
+
+                    // Kiểm tra giá trị hợp lệ
+                    if (isNaN(quantity) || quantity <= 0) {
+                        alert('Please enter a valid quantity (minimum 1).');
+                        return;
+                    }
+                    if (!productId || productId <= 0 || isNaN(productId)) {
+                        alert('Invalid product ID.');
+                        return;
+                    }
+
+                    // Gửi yêu cầu dưới dạng JSON
+                    $.ajax({
+                        url: '/api/cart/add',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ productId: productId, quantity: quantity }),
+                        success: function (response) {
+                            alert(response.Message || 'Product added to cart successfully!');
+                            updateCartBadge();
+                        },
+                        error: function (xhr) {
+                            // Xử lý lỗi chi tiết
+                            var errorMessage = xhr.responseJSON?.Message || 'Unknown error';
+                            console.log('Error Response:', xhr.responseText); // Log phản hồi chi tiết
+                            if (xhr.status === 400) {
+                                alert('Error adding product: ' + errorMessage);
+                            } else if (xhr.status === 403 || xhr.status === 401) {
+                                alert('Please log in to add products to your cart.');
+                                window.location.href = '@Url.Action("Login", "Auth")';
+                            } else {
+                                alert('Error adding product: ' + errorMessage + ' (Status: ' + xhr.status + ')');
+                            }
+                        }
+                    });
+                });
+
+                
+
+                function updateCartBadge() {
+                    $.get('/api/cart', function (data) {
+                        var itemCount = data.length || 0;
+                        $('#cartBadge').text(itemCount);
+                    }).fail(function () {
+                        $('#cartBadge').text('0');
+                    });
+                }
+
+                // Cập nhật số lượng ban đầu khi tải trang
+                updateCartBadge();
+
+                // Initialize carousel
+                $(".related-carousel").owlCarousel({
+                    loop: true,
+                    margin: 29,
+                    nav: true,
+                    autoplay: true,
+                    smartSpeed: 1000,
+                    responsive: {
+                        0:{
+                            items:1
+                        },
+                        576:{
+                            items:2
+                        },
+                        768:{
+                            items:3
+                        },
+                        992:{
+                            items:4
+                        }
+                    }
+                });
             });
         </script>
     

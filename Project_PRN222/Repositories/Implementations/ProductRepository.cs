@@ -38,8 +38,13 @@ namespace Project_PRN222.Repositories.Implementations
 
         public void Update(Product product)
         {
-            _context.Products.Update(product);
-            _context.SaveChanges();
+            var existingProduct = _context.Products.Find(product.ProductId);
+            if (existingProduct != null)
+            {
+                // Cập nhật từng thuộc tính
+                _context.Entry(existingProduct).CurrentValues.SetValues(product);
+                _context.SaveChanges();
+            }
         }
     }
 }

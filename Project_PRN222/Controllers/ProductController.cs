@@ -16,10 +16,18 @@ namespace Project_PRN222.Controllers
         }
 
         // Xem danh sách sản phẩm - mọi vai trò đều được phép
-        public IActionResult Index()
+        // Controllers/ProductController.cs
+        public IActionResult Index(int? categoryId)
         {
             var products = _productService.GetAllProducts();
-            return View(products); // Assuming you have an Index.cshtml in Views/Product to display products
+    
+           
+            if (categoryId.HasValue)
+            {
+                products = products.Where(p => p.CategoryId == categoryId.Value).ToList();
+            }
+    
+            return View(products);
         }
 
         [HttpGet("api/products")]
@@ -143,7 +151,7 @@ namespace Project_PRN222.Controllers
         }
 
         // Action to return Edit Product View (Admin, Vendor)
-        [HttpGet("EditView/{id}")]
+        [HttpGet("EditView/{id}")]  // Thay đổi từ HttpPut sang HttpGet
         [RoleAuthorize(1, 2)]
         public IActionResult EditView(int id)
         {
@@ -152,7 +160,26 @@ namespace Project_PRN222.Controllers
             {
                 return NotFound();
             }
-            return View("Edit", product); // Assuming you have an Edit.cshtml in Views/Product for editing products, passing the product model
+            return View("EditView", product); 
+        }
+
+        [HttpPost("UpdateProduct")]
+        [RoleAuthorize(1, 2)]
+        public IActionResult UpdateProduct(Product product)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _productService.UpdateProduct(product);
+                    return RedirectToAction("Index");
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error updating product: " + ex.Message);
+                }
+            }
+            return View("EditView", product);
         }
 
 

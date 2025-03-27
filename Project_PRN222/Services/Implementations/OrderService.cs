@@ -41,7 +41,8 @@ namespace Project_PRN222.Services.Implementations
             return userId;
         }
 
-        public async Task<string> Checkout(string shippingAddress, string billingAddress, int shipmentMethodId, string paymentMethod)
+        public async Task<string> Checkout(string shippingAddress, string billingAddress, int shipmentMethodId,
+            string paymentMethod)
         {
             var userId = GetCurrentUserId();
             var cartItems = await _cartRepository.GetByUserId(userId);
@@ -113,6 +114,7 @@ namespace Project_PRN222.Services.Implementations
             {
                 await _cartRepository.Delete(item.CartItemId);
             }
+
             return "Order created successfully.";
         }
 
@@ -138,7 +140,7 @@ namespace Project_PRN222.Services.Implementations
                 paymentMethod = query["vnp_CardType"],
                 paymentResponse = new
                 {
-                    code = (int?)paymentResult.PaymentResponse?.Code ?? -1, 
+                    code = (int?)paymentResult.PaymentResponse?.Code ?? -1,
                     description = paymentResult.PaymentResponse?.Description ?? "Unknown"
                 },
                 transactionStatus = new
@@ -183,6 +185,7 @@ namespace Project_PRN222.Services.Implementations
                         {
                             await _cartRepository.Delete(item.CartItemId);
                         }
+
                         Console.WriteLine($"Deleted {cartItems.Count()} cart items for UserId {order.UserId.Value}.");
                     }
                 }
@@ -191,6 +194,11 @@ namespace Project_PRN222.Services.Implementations
             }
 
             return new BadRequestObjectResult(response);
+        }
+
+        public async Task<Order> GetOrderById(int orderId)
+        {
+            return await _orderRepository.GetById(orderId);
         }
     }
 }
