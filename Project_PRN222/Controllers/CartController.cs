@@ -4,8 +4,6 @@ using Project_PRN222.Services.Interfaces;
 
 namespace Project_PRN222.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
     public class CartController : Controller
     {
         private readonly ICartService _cartService;
@@ -15,21 +13,32 @@ namespace Project_PRN222.Controllers
             _cartService = cartService;
         }
 
-        [HttpGet("cart")]
+        // GET: Cart/Cart - Hiển thị trang giỏ hàng
+        [HttpGet("Cart/Cart")]
         [RoleAuthorize(1, 2, 3)]
         public async Task<IActionResult> Cart()
         {
-            var cartItems = await _cartService.GetCartItems();
-            return View("Cart", cartItems); // Assuming you have a Cart.cshtml view in Views/Cart, and passing cartItems to the view
+            try
+            {
+                var cartItems = await _cartService.GetCartItems();
+                // Chuyển đổi IEnumerable<CartItemDto> thành List<CartItemDto>
+                return View("Cart", cartItems.ToList());
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction("Index", "Home");
+            }
         }
 
-        [HttpPost("add")]
+        // API Endpoints
+        [HttpPost("api/cart/add")]
         [RoleAuthorize(1, 2, 3)]
-        public async Task<IActionResult> AddToCart(int productId, int quantity)
+        public async Task<IActionResult> AddToCart([FromBody] AddToCartRequest request)
         {
             try
             {
-                await _cartService.AddToCart(productId, quantity);
+                await _cartService.AddToCart(request.ProductId, request.Quantity);
                 return Ok(new { Message = "Product added to cart successfully." });
             }
             catch (Exception ex)
@@ -38,7 +47,7 @@ namespace Project_PRN222.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpGet("api/cart")]
         [RoleAuthorize(1, 2, 3)]
         public async Task<IActionResult> GetCartItems()
         {
@@ -53,7 +62,7 @@ namespace Project_PRN222.Controllers
             }
         }
 
-        [HttpPut("{cartItemId}")]
+        [HttpPut("api/cart/{cartItemId}")]
         [RoleAuthorize(1, 2, 3)]
         public async Task<IActionResult> UpdateCartItem(int cartItemId, [FromBody] int quantity)
         {
@@ -68,7 +77,7 @@ namespace Project_PRN222.Controllers
             }
         }
 
-        [HttpDelete("{cartItemId}")]
+        [HttpDelete("api/cart/{cartItemId}")]
         [RoleAuthorize(1, 2, 3)]
         public async Task<IActionResult> RemoveFromCart(int cartItemId)
         {
@@ -82,5 +91,11 @@ namespace Project_PRN222.Controllers
                 return BadRequest(new { Message = ex.Message });
             }
         }
+    }
+
+    public class AddToCartRequest
+    {
+        public int ProductId { get; set; }
+        public int Quantity { get; set; }
     }
 }

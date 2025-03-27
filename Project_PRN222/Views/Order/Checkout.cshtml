@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Project_PRN222.DTO.CartItemDto> // Giả định CartItemDto để hiển thị giỏ hàng
+﻿@model IEnumerable<Project_PRN222.DTO.CartItemDto> 
 
 @{
     ViewData["Title"] = "Checkout - Vmade";
@@ -225,7 +225,7 @@
                             <!-- Shipping Address -->
                             <div class="mb-3">
                                 <h6 class="font-weight-medium">Shipping Address</h6>
-                                <textarea class="form-control" name="shippingAddress" rows="3" placeholder="Enter your shipping address" required>[ShippingAddress]</textarea>
+                                <textarea id="shippingAddress" class="form-control" rows="3" placeholder="Enter your shipping address"></textarea>
                             </div>
                             <!-- Billing Address (giả định bằng shippingAddress nếu không có input riêng) -->
                             <!-- <div class="mb-3">
@@ -239,11 +239,10 @@
                             </div>
                             <!-- Shipment Method -->
                             <div class="mb-3">
-                                <h6 class="font-weight-medium">Shipment Method</h6>
-                                <select class="form-control" name="shipmentMethodId" required>
-                                    <option value="">Select a shipment method</option>
-                                    <option value="1">Standard Shipping (3-5 days) - 30,000 VND</option>
-                                    <option value="2">Express Shipping (1-2 days) - 50,000 VND</option>
+                                <h6 class="font-weight-medium">Shipping Method</h6>
+                                <select name="shipmentMethod" class="form-control">
+                                    <option value="1">Standard Shipping - 30,000 VND</option>
+                                    <option value="2">Express Shipping - 50,000 VND</option>
                                 </select>
                             </div>
                             <!-- Payment Method -->
@@ -410,42 +409,126 @@
     <!-- Custom Script to Sync Form Data (Demo Mode) -->
     <script>
         $(document).ready(function () {
-            // Ngăn gửi form thực sự để demo
+            // Xử lý sự kiện submit form
             $('#checkoutForm').on('submit', function (e) {
                 e.preventDefault();
-                // Đồng bộ dữ liệu từ input vào hidden fields
-                $('#hiddenShippingAddress').val($('textarea[name="shippingAddress"]').val());
-                $('#hiddenBillingAddress').val($('textarea[name="shippingAddress"]').val()); // Giả định billingAddress = shippingAddress
-                $('#hiddenShipmentMethodId').val($('select[name="shipmentMethodId"]').val());
-                $('#hiddenPaymentMethod').val($('input[name="paymentMethod"]:checked').val());
 
-                // Giả lập phản hồi thành công cho demo
-                alert('Order placed successfully! (Demo Mode)');
-                console.log('Form data (for backend mapping to CheckoutRequest):', {
-                    shippingAddress: $('#hiddenShippingAddress').val(),
-                    billingAddress: $('#hiddenBillingAddress').val(),
-                    shipmentMethodId: $('#hiddenShipmentMethodId').val(),
-                    paymentMethod: $('#hiddenPaymentMethod').val()
+                // Lấy dữ liệu từ form
+                var shippingAddress = $('textarea[name="shippingAddress"]').val();
+                var shipmentMethodId = parseInt($('select[name="shipmentMethodId"]').val());
+                var paymentMethod = $('input[name="paymentMethod"]:checked').val();
+
+                // Kiểm tra dữ liệu
+                if (!shippingAddress) {
+                    alert('Please enter your shipping address');
+                    return;
+                }
+
+                if (isNaN(shipmentMethodId)) {
+                    alert('Please select a shipment method');
+                    return;
+                }
+
+                if (!paymentMethod) {
+                    alert('Please select a payment method');
+                    return;
+                }
+
+                // Tạo đối tượng dữ liệu để gửi
+                var checkoutData = {
+                    shippingAddress: shippingAddress,
+                    billingAddress: shippingAddress, // Sử dụng cùng địa chỉ cho billing
+                    shipmentMethodId: shipmentMethodId,
+                    paymentMethod: paymentMethod
+                };
+
+                // Gửi request đến API
+                $.ajax({
+                    url: '/api/Order/checkout',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(checkoutData),
+                    success: function (response) {
+                        if (paymentMethod === 'VNPAY' && response.paymentUrl) {
+                            // Chuyển hướng đến trang thanh toán VNPAY
+                            window.location.href = response.paymentUrl;
+                        } else {
+                            // Hiển thị thông báo thành công
+                            alert(response.message || 'Order placed successfully!');
+                            // Chuyển hướng về trang chủ
+                            window.location.href = '/Home/Index';
+                        }
+                    },
+                    error: function (xhr) {
+                        var errorMessage = xhr.responseJSON?.message || 'An error occurred during checkout';
+                        alert('Error: ' + errorMessage);
+                    }
                 });
             });
-
-            // Hàm demo cho nút Place Order
-            function placeOrderDemo() {
-                // Đồng bộ dữ liệu từ input vào hidden fields
-                $('#hiddenShippingAddress').val($('textarea[name="shippingAddress"]').val());
-                $('#hiddenBillingAddress').val($('textarea[name="shippingAddress"]').val()); // Giả định billingAddress = shippingAddress
-                $('#hiddenShipmentMethodId').val($('select[name="shipmentMethodId"]').val());
-                $('#hiddenPaymentMethod').val($('input[name="paymentMethod"]:checked').val());
-
-                alert('Order placed successfully! (Demo Mode)');
-                console.log('Form data (for backend mapping to CheckoutRequest):', {
-                    shippingAddress: $('#hiddenShippingAddress').val(),
-                    billingAddress: $('#hiddenBillingAddress').val(),
-                    shipmentMethodId: $('#hiddenShipmentMethodId').val(),
-                    paymentMethod: $('#hiddenPaymentMethod').val()
-                });
-            }
         });
+        function placeOrderDemo() {
+            // Lấy dữ liệu từ form
+            var shippingAddress = $('#shippingAddress').val();
+            var shipmentMethodId = parseInt($('select[name="shipmentMethod"]').val());
+            var paymentMethod = $('input[name="paymentMethod"]:checked').val();
+
+            // Kiểm tra dữ liệu
+            if (!shippingAddress) {
+                alert('Please enter your shipping address');
+                return;
+            }
+
+            if (isNaN(shipmentMethodId)) {
+                alert('Please select a shipment method');
+                return;
+            }
+
+            if (!paymentMethod) {
+                alert('Please select a payment method');
+                return;
+            }
+
+            // Cập nhật các trường ẩn
+            $('#hiddenShippingAddress').val(shippingAddress);
+            $('#hiddenBillingAddress').val(shippingAddress); // Sử dụng cùng địa chỉ
+            $('#hiddenShipmentMethodId').val(shipmentMethodId);
+            $('#hiddenPaymentMethod').val(paymentMethod);
+
+            // Tạo đối tượng dữ liệu để gửi
+            var checkoutData = {
+                shippingAddress: shippingAddress,
+                billingAddress: shippingAddress, // Sử dụng cùng địa chỉ cho billing
+                shipmentMethodId: shipmentMethodId,
+                paymentMethod: paymentMethod
+            };
+
+            console.log('Sending checkout data:', checkoutData);
+
+            // Gửi request đến API
+            $.ajax({
+                url: '/api/Order/checkout',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(checkoutData),
+                success: function (response) {
+                    console.log('Checkout response:', response);
+                    if (paymentMethod === 'VNPAY' && response.paymentUrl) {
+                        // Chuyển hướng đến trang thanh toán VNPAY
+                        window.location.href = response.paymentUrl;
+                    } else {
+                        // Hiển thị thông báo thành công
+                        alert(response.message || 'Order placed successfully!');
+                        // Chuyển hướng về trang chủ
+                        window.location.href = '/Home/Index';
+                    }
+                },
+                error: function (xhr) {
+                    console.error('Checkout error:', xhr);
+                    var errorMessage = xhr.responseJSON?.message || 'An error occurred during checkout';
+                    alert('Error: ' + errorMessage);
+                }
+            });
+        }
     </script>
 </body>
 </html>

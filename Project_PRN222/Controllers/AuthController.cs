@@ -202,5 +202,20 @@ namespace Project_PRN222.Controllers
                 return BadRequest(new { Message = ex.Message });
             }
         }
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            
+            HttpContext.Session.Clear();
+    
+            
+            foreach (var cookie in Request.Cookies.Keys)
+            {
+                Response.Cookies.Delete(cookie);
+            }
+    
+            
+            return RedirectToAction("Index", "Home");
+        }
     }
 }

@@ -2,21 +2,40 @@
 using Project_PRN222.Attributes;
 using Project_PRN222.Models;
 using System.Diagnostics;
+using Project_PRN222.Services.Interfaces;
 
 namespace Project_PRN222.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly ICategoryService _categoryService;
+        private readonly IProductService _productService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(
+            ILogger<HomeController> logger,
+            ICategoryService categoryService,
+            IProductService productService)
         {
             _logger = logger;
+            _categoryService = categoryService;
+            _productService = productService;
         }
 
         public IActionResult Index()
         {
-            return View(); // Returns Views/Home/Index.cshtml
+            // Load categories and featured products for the home page
+            var categories = _categoryService.GetAllCategories();
+            var featuredProducts = _productService.GetAllProducts().Take(8).ToList(); // Get first 8 products
+            
+            // Create a view model to hold both data sets
+            var viewModel = new HomeViewModel
+            {
+                Categories = categories,
+                FeaturedProducts = featuredProducts
+            };
+            
+            return View(viewModel); // Pass the view model to the view
         }
 
         // Admin Dashboard View

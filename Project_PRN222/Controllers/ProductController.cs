@@ -67,6 +67,31 @@ namespace Project_PRN222.Controllers
 
             return Ok(productDto);
         }
+        // GET: Product/Detail/5
+        public IActionResult Detail(int id)
+        {
+            var product = _productService.GetProductById(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+    
+            
+            ViewBag.CategoryName = product.Category?.CategoryName ?? "Uncategorized";
+            ViewBag.VendorName = product.Vendor?.VendorName ?? "Unknown Vendor";
+    
+            
+            if (product.CategoryId.HasValue)
+            {
+                var relatedProducts = _productService.GetAllProducts()
+                    .Where(p => p.CategoryId == product.CategoryId && p.ProductId != product.ProductId)
+                    .Take(4)
+                    .ToList();
+                ViewBag.RelatedProducts = relatedProducts;
+            }
+    
+            return View(product);
+        }
 
         // Action to return Create Product View (Admin, Vendor)
         [HttpGet("CreateView")]

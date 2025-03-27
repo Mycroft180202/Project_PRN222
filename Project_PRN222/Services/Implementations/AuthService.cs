@@ -1,4 +1,7 @@
-﻿using Project_PRN222.DTO;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Project_PRN222.DTO;
 using Project_PRN222.Models;
 using Project_PRN222.Repositories.Interfaces;
 using Project_PRN222.Services.Interfaces;
@@ -80,6 +83,27 @@ namespace Project_PRN222.Services.Implementations
             session.SetString("UserName", user.UserName);
             session.SetString("RoleId", user.RoleId.ToString());
             session.SetString("IsActive", user.IsActive.ToString());
+
+            // Thiết lập Cookie Authentication
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim("UserId", user.UserId.ToString()),
+                new Claim("RoleId", user.RoleId.ToString())
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties
+            {
+               
+                ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
+            };
+
+            await _httpContextAccessor.HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties);
 
             return user;
         }

@@ -344,7 +344,7 @@
                     <div class="card-footer border-secondary bg-transparent">
                         <div class="d-flex justify-content-between mt-2">
                             <h5 class="font-weight-bold">Total</h5>
-                            <h5 class="font-weight-bold" id="total">@(Model != null ? (Model.Sum(x => x.Price * x.Quantity) + 10).ToString("C") : "$10")</h6>
+                            <h5 class="font-weight-bold" id="total">@(Model != null ? (Model.Sum(x => x.Price * x.Quantity) + 10).ToString("C") : "$10")</h5>
                         </div>
                         <a href="/Order/Checkout" class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</a>
                     </div>
@@ -545,6 +545,7 @@
             updateCartSummary();
             updateCartBadge();
         });
+        
     </script>
 </body>
 
