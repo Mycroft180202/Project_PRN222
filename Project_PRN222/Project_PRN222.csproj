@@ -6,4 +6,65 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="MailKit" Version="4.10.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="9.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.2" />
+    <PackageReference Include="VNPAY.NET" Version="8.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Views\Product\Detail.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\10\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\11\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\2\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\3\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\4\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\5\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\6\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\7\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\8\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\GỐM\9\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\LỤA\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\LỤA\1\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\LỤA\2\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\LỤA\3\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\10\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\1\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\2\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\3\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\4\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\5\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\6\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\7\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\8\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\MÂY TRE ĐAN\9\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\NÓN LÁ\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\NÓN LÁ\1\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\NÓN LÁ\2\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\NÓN LÁ\3\.DS_Store" />
+    <None Include="wwwroot\img\SẢN PHẨM\NÓN LÁ\4\.DS_Store" />
+  </ItemGroup>
+
 </Project>

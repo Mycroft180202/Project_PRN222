@@ -1,0 +1,452 @@
+﻿@model Project_PRN222.Models.User
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Profile - EShopper";
+    Layout = null; // Tắt layout mặc định để đồng bộ với Home/Index.cshtml
+
+    // Kiểm tra lỗi 404 hoặc dữ liệu không hợp lệ
+    bool hasError = Model == null || !User.Identity.IsAuthenticated;
+
+    // Lấy RoleId từ Model để kiểm tra quyền, fallback về Claims nếu Model không đúng
+    int roleIdFromModel = Model?.RoleId ?? 0;
+    string roleIdFromClaims = User.Claims.FirstOrDefault(c => c.Type == "RoleId")?.Value;
+    int roleId = roleIdFromClaims != null && int.TryParse(roleIdFromClaims, out int claimRoleId) ? claimRoleId : roleIdFromModel;
+
+    // Debug để kiểm tra
+    var debugMessage = $"Model.RoleId: {roleIdFromModel}, Claims.RoleId: {roleIdFromClaims}, Final RoleId: {roleId}";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>@ViewData["Title"]</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Free HTML Templates" name="keywords">
+    <meta content="Free HTML Templates" name="description">
+
+    <!-- Favicon -->
+    <link href="~/img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="~/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Customized Stylesheet -->
+    <link href="~/css/style.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+        .navbar-light .navbar-nav .nav-link:hover,
+        .navbar-light .navbar-nav .nav-link.active {
+            color: #D19C97;
+        }
+
+        .navbar-light .navbar-nav .dropdown-menu .dropdown-item:hover,
+        .navbar-light .navbar-nav .dropdown-menu .dropdown-item.active {
+            color: #D19C97;
+        }
+
+        .navbar-container {
+            background: #fff;
+            border-bottom: 1px solid #e8ecef;
+            padding: 0 15px;
+        }
+
+        .profile-container {
+            padding: 40px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            max-width: 1000px;
+        }
+
+        .profile-container h2 {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .profile-container .form-group label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .profile-container .form-control {
+            border-radius: 5px;
+            background: #f8f9fa;
+        }
+
+        .btn-primary {
+            background: #D19C97;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #c08b86;
+        }
+
+        .error-message {
+            text-align: center;
+            color: #dc3545;
+            margin: 20px 0;
+        }
+
+        .container-fluid {
+            padding: 0 15px;
+        }
+
+        .debug-message {
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Topbar Start -->
+    <div class="container-fluid">
+        <div class="row bg-secondary py-2 px-xl-5">
+            <div class="col-lg-6 d-none d-lg-block">
+                <div class="d-inline-flex align-items-center">
+                    <a class="text-dark" href="@Url.Action("Index", "Home")#faq">FAQs</a>
+                    <span class="text-muted px-2">|</span>
+                    <a class="text-dark" href="@Url.Action("Contact", "Home")">Help</a>
+                    <span class="text-muted px-2">|</span>
+                    <a class="text-dark" href="@Url.Action("Contact", "Home")">Support</a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center text-lg-right">
+                <div class="d-inline-flex align-items-center">
+                    <a class="text-dark px-2" href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a class="text-dark px-2" href="#"><i class="fab fa-twitter"></i></a>
+                    <a class="text-dark px-2" href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a class="text-dark px-2" href="#"><i class="fab fa-instagram"></i></a>
+                    <a class="text-dark pl-2" href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        <!-- Navbar Start (Không có Category) -->
+        <div class="navbar-container">
+            <nav class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-0">
+                <a href="@Url.Action("Index", "Home")" class="text-decoration-none d-block d-lg-none">
+                    <h1 class="m-0 display-5 font-weight-semi-bold"><span class="text-primary font-weight-bold border px-3 mr-1">E</span>Shopper</h1>
+                </a>
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                    <div class="navbar-nav mr-auto py-0">
+                        <a href="@Url.Action("Index", "Home")" class="nav-item nav-link active">Home</a>
+                        <a href="/Product/Index" class="nav-item nav-link">Shop</a>
+                        <div class="nav-item dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages</a>
+                            <div class="dropdown-menu rounded-0 m-0">
+                                <a href="/Cart/Cart" class="dropdown-item">Shopping Cart</a>
+                                <a href="/Order/Checkout" class="dropdown-item">Checkout</a>
+                            </div>
+                        </div>
+                        <a href="@Url.Action("Privacy", "Home")" class="nav-item nav-link">Privacy</a>
+                        <a href="@Url.Action("Contact", "Home")" class="nav-item nav-link">Contact</a>
+                    </div>
+                    <div class="navbar-nav ml-auto py-0">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <div class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                                    Welcome, @User.Identity.Name
+                                </a>
+                                <div class="dropdown-menu rounded-0 m-0">
+                                    @{
+                                        var roleIdNav = User.Claims.FirstOrDefault(c => c.Type == "RoleId")?.Value;
+                                        if (roleIdNav == "1") // ADMIN
+                                        {
+                                            <a href="@Url.Action("AdminDashboard", "Home")" class="dropdown-item">Admin Dashboard</a>
+                                        }
+                                        else if (roleIdNav == "2") // VENDOR
+                                        {
+                                            <a href="@Url.Action("VendornDashboard", "Home")" class="dropdown-item">Vendor Dashboard</a>
+                                        }
+                                    }
+                                    @if (User.Identity.IsAuthenticated && (roleIdNav == "1" || roleIdNav == "2" || roleIdNav == "3"))
+                                    {
+                                        <a href="@Url.Action("ProfileView", "User")" class="dropdown-item">Profile</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="dropdown-item text-muted">Profile (Access Denied)</span>
+                                    }
+                                    <form asp-action="Logout" asp-controller="Auth" method="post" style="margin: 0;">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="dropdown-item">Logout</button>
+                                    </form>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Login", "Auth")" class="nav-item nav-link">Login</a>
+                            <a href="@Url.Action("Register", "Auth")" class="nav-item nav-link">Register</a>
+                        }
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Profile Content -->
+    <div class="container-fluid">
+        @if (hasError)
+        {
+            <!-- Hiển thị lỗi 404 nếu không có dữ liệu người dùng -->
+            <div class="profile-container">
+                <h2 class="error-message">Error 404 (Not Found)!!1</h2>
+                <p class="text-center">That’s an error. The requested user profile was not found on this server. That’s all we know.</p>
+                <p class="text-center"><strong># 404 Not Found</strong> - Powered by nginx</p>
+                <div class="text-center mt-4">
+                    <a href="@Url.Action("Index", "Home")" class="btn btn-primary">Back to Home</a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <!-- Hiển thị thông tin người dùng từ Model -->
+            <div class="profile-container">
+                <h2><i class="fas fa-user mr-2"></i> My Profile</h2>
+                
+                
+                <form id="profileForm" asp-action="UpdateMyProfile" asp-controller="User" method="put">
+                    @Html.AntiForgeryToken()
+                    <div class="form-group">
+                        <label><i class="fas fa-id-badge mr-2"></i> User ID</label>
+                        <input class="form-control" readonly value="@Model.UserId" />
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-user-tag mr-2"></i> Username</label>
+                        <input class="form-control" readonly value="@Model.UserName" />
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope mr-2"></i> Email</label>
+                        <input class="form-control" id="email" name="Email" value="@Model.Email" placeholder="Enter email" />
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-user mr-2"></i> First Name</label>
+                        <input class="form-control" id="firstName" name="FirstName" value="@Model.FirstName" placeholder="Enter first name" />
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-user mr-2"></i> Last Name</label>
+                        <input class="form-control" id="lastName" name="LastName" value="@Model.LastName" placeholder="Enter last name" />
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-phone mr-2"></i> Phone Number</label>
+                        <input class="form-control" id="phoneNumber" name="PhoneNumber" value="@Model.PhoneNumber" placeholder="Enter phone number" />
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-map-marker-alt mr-2"></i> Address</label>
+                        <input class="form-control" id="address" name="Address" value="@Model.Address" placeholder="Enter address" />
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-alt mr-2"></i> Registration Date</label>
+                        <input class="form-control" readonly value="@(Model.RegistrationDate.HasValue ? Model.RegistrationDate.Value.ToString("yyyy-MM-dd") : "")" />
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-toggle-on mr-2"></i> Active</label>
+                        
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-user-shield mr-2"></i> Role</label>
+                        @if (roleId == 3) // Role 3 không được sửa RoleId
+                        {
+                            <select class="form-control" disabled>
+                                @if (roleId == 1)
+                                {
+                                    <option value="1" selected>Admin</option>
+                                }
+                                else
+                                {
+                                    <option value="1">Admin</option>
+                                }
+                                @if (roleId == 2)
+                                {
+                                    <option value="2" selected>Vendor</option>
+                                }
+                                else
+                                {
+                                    <option value="2">Vendor</option>
+                                }
+                                @if (roleId == 3)
+                                {
+                                    <option value="3" selected>User</option>
+                                }
+                                else
+                                {
+                                    <option value="3">User</option>
+                                }
+                            </select>
+                        }
+                        else // Role 1, 2 có thể sửa RoleId
+                        {
+                            <select class="form-control" id="roleId" name="RoleId">
+                                @if (roleId == 1)
+                                {
+                                    <option value="1" selected>Admin</option>
+                                }
+                                else
+                                {
+                                    <option value="1">Admin</option>
+                                }
+                                @if (roleId == 2)
+                                {
+                                    <option value="2" selected>Vendor</option>
+                                }
+                                else
+                                {
+                                    <option value="2">Vendor</option>
+                                }
+                                @if (roleId == 3)
+                                {
+                                    <option value="3" selected>User</option>
+                                }
+                                else
+                                {
+                                    <option value="3">User</option>
+                                }
+                            </select>
+                        }
+                    </div>
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary mr-2"><i class="fas fa-save mr-2"></i> Save Changes</button>
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-primary"><i class="fas fa-arrow-left mr-2"></i> Back to Home</a>
+                    </div>
+                </form>
+            </div>
+        }
+    </div>
+
+    <!-- Footer Start -->
+    <div class="container-fluid bg-secondary text-dark mt-5 pt-5">
+        <div class="row px-xl-5 pt-5">
+            <div class="col-lg-4 col-md-12 mb-5 pr-3 pr-xl-5">
+                <a href="@Url.Action("Index", "Home")" class="text-decoration-none">
+                    <h1 class="mb-4 display-5 font-weight-semi-bold"><span class="text-primary font-weight-bold border border-white px-3 mr-1">E</span>Shopper</h1>
+                </a>
+                <p>E-Shopper is an online store offering handmade products such as ceramics, silk, and bamboo woven items. Discover unique, artfully crafted, and sustainable products for your living space</p>
+                <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>29 Mã Mây, Hoàn Kiếm, Hà Nội</p>
+                <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>eshopper@gmail.com.vn</p>
+                <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>086 911 5100</p>
+            </div>
+            <div class="col-lg-8 col-md-12">
+                <div class="row">
+                    <div class="col-md-4 mb-5">
+                        <h5 class="font-weight-bold text-dark mb-4">Quick Links</h5>
+                        <div class="d-flex flex-column justify-content-start">
+                            <a class="text-dark mb-2" href="@Url.Action("Index", "Home")"><i class="fa fa-angle-right mr-2"></i>Home</a>
+                            <a class="text-dark mb-2" href="@Url.Action("Shop", "Home")"><i class="fa fa-angle-right mr-2"></i>Our Shop</a>
+                            <a class="text-dark mb-2" href="/api/cart/cart"><i class="fa fa-angle-right mr-2"></i>Shopping Cart</a>
+                            <a class="text-dark mb-2" href="@Url.Action("Checkout", "Home")"><i class="fa fa-angle-right mr-2"></i>Checkout</a>
+                            <a class="text-dark" href="@Url.Action("Contact", "Home")"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-5">
+                        <h5 class="font-weight-bold text-dark mb-4">Quick Links</h5>
+                        <div class="d-flex flex-column justify-content-start">
+                            <a class="text-dark mb-2" href="@Url.Action("Index", "Home")"><i class="fa fa-angle-right mr-2"></i>Home</a>
+                            <a class="text-dark mb-2" href="@Url.Action("Shop", "Home")"><i class="fa fa-angle-right mr-2"></i>Our Shop</a>
+                            <a class="text-dark mb-2" href="/api/cart/cart"><i class="fa fa-angle-right mr-2"></i>Shopping Cart</a>
+                            <a class="text-dark mb-2" href="@Url.Action("Checkout", "Home")"><i class="fa fa-angle-right mr-2"></i>Checkout</a>
+                            <a class="text-dark" href="@Url.Action("Contact", "Home")"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-5">
+                        <h5 class="font-weight-bold text-dark mb-4">Newsletter</h5>
+                        <form action="@Url.Action("Subscribe", "Home")" method="post">
+                            <div class="form-group">
+                                <input type="text" class="form-control border-0 py-4" name="name" placeholder="Your Name" required="required" />
+                            </div>
+                            <div class="form-group">
+                                <input type="email" class="form-control border-0 py-4" name="email" placeholder="Your Email" required="required" />
+                            </div>
+                            <div>
+                                <button class="btn btn-primary btn-block border-0 py-3" type="submit">Subscribe Now</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row border-top border-light mx-xl-5 py-4">
+            <div class="col-md-6 px-xl-0">
+                <p class="mb-md-0 text-center text-md-left text-dark">
+                    © <a class="text-dark font-weight-semi-bold" href="#">Your Site Name</a>. All Rights Reserved.
+                    Designed by <a class="text-dark font-weight-semi-bold" href="https://htmlcodex.com">HTML Codex</a>
+                </p>
+            </div>
+            <div class="col-md-6 px-xl-0 text-center text-md-right">
+                <img class="img-fluid" src="~/img/payments.png" alt="">
+            </div>
+        </div>
+    </div>
+    <!-- Footer End -->
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/easing/easing.min.js"></script>
+    <script src="~/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="~/mail/jqBootstrapValidation.min.js"></script>
+    <script src="~/mail/contact.js"></script>
+    <script src="~/js/main.js"></script>
+
+    <!-- Custom Script để gửi dữ liệu về backend -->
+    <script>
+        $(document).ready(function () {
+            $('#profileForm').on('submit', function (e) {
+                e.preventDefault();
+
+                var formData = {
+                    Email: $('#email').val(),
+                    FirstName: $('#firstName').val(),
+                    LastName: $('#lastName').val(),
+                    PhoneNumber: $('#phoneNumber').val(),
+                    Address: $('#address').val(),
+                    RoleId: $('#roleId') ? $('#roleId').val() : @Model.RoleId // RoleId chỉ gửi nếu có trường select
+                };
+
+                console.log("Sending data:", formData); // Debug dữ liệu gửi đi
+
+                $.ajax({
+                    url: '/api/User/me',
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function (response) {
+                        alert('Profile updated successfully!');
+                        window.location.reload(); // Tải lại trang để cập nhật giao diện
+                    },
+                    error: function (xhr) {
+                        var errorMessage = xhr.responseText || 'An error occurred while updating the profile.';
+                        alert('Error updating profile: ' + errorMessage);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
