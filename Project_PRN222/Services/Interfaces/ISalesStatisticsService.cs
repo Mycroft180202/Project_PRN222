@@ -11,6 +11,7 @@ namespace Project_PRN222.Services.Interfaces
         Task<SalesStatistic> CreateStatistic(SalesStatistic statistic);
         Task UpdateStatistic(SalesStatistic statistic);
         Task DeleteStatistic(int id);
+        Task<SalesStatistic> GenerateDailyReport(DateOnly reportDate, string timeDimension, int? productId = null, int? categoryId = null);
         
     }
 }

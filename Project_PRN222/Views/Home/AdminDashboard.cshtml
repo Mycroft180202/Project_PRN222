@@ -400,10 +400,44 @@
 
                     <!-- Sales Statistics Tab -->
                     <div class="tab-pane fade" id="sales-statistics">
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3>Top Buyers</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table" id="topBuyersTable">
+                                                <thead>
+                                                <tr>
+                                                    <th>Rank</th>
+                                                    <th>User</th>
+                                                    <th>Total Purchases</th>
+                                                    <th>Total Spent</th>
+                                                    <th>Last Purchase</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <!-- Top buyers will be loaded here -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="card">
-                            <div class="card-header">
+                            <div class="card-header d-flex justify-content-between align-items-center">
                                 <h3>Sales Statistics</h3>
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSalesStatisticModal">Add Statistic</button>
+                                <div>
+                                    
+                                    <button class="btn btn-success" id="generateReportBtn">
+                                        <i class="fas fa-file-alt"></i> Generate Today's Report
+                                    </button>
+                                </div>
                             </div>
                             <div class="card-body p-0">
                                 <div class="table-responsive">
@@ -412,8 +446,8 @@
                                         <tr>
                                             <th>ID</th>
                                             <th>Report Date</th>
-                                            <th>Product ID</th>
-                                            <th>Category ID</th>
+                                            <th>Product</th>
+                                            <th>Category</th>
                                             <th>Total Quantity Sold</th>
                                             <th>Total Revenue</th>
                                             <th>Time Dimension</th>
@@ -422,23 +456,7 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        @foreach (var stat in mockSalesStatistics)
-                                        {
-                                            <tr>
-                                                <td>@stat.StatisticId</td>
-                                                <td>@stat.ReportDate.ToString("yyyy-MM-dd")</td>
-                                                <td>@stat.ProductId</td>
-                                                <td>@stat.CategoryId</td>
-                                                <td>@stat.TotalQuantitySold</td>
-                                                <td>@stat.TotalRevenue.ToString("N0")</td>
-                                                <td>@stat.TimeDimension</td>
-                                                <td>@stat.TopBuyer</td>
-                                                <td>
-                                                    <button class="btn btn-warning mr-2 edit-statistic" data-id="@stat.StatisticId">Edit</button>
-                                                    <button class="btn btn-danger delete-statistic" data-id="@stat.StatisticId">Delete</button>
-                                                </td>
-                                            </tr>
-                                        }
+                                        <!-- Sales statistics will be loaded here -->
                                         </tbody>
                                     </table>
                                 </div>
@@ -926,6 +944,7 @@
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 
     <!-- Custom JavaScript -->
     <script>
@@ -1232,42 +1251,93 @@
                 });
                 $('.sidebar a.nav-link[data-tab]:first').click();
                 // Load Sales Statistics
-                function loadSalesStatistics() {
+                // Load Sales Statistics
+                function loadSalesStatistics(dateFilter = null) {
+                    console.log("Loading sales statistics...");
                     $.ajax({
                         url: '/api/SalesStatistics',
                         method: 'GET',
                         success: function(statistics) {
+                            console.log("Statistics loaded:", statistics);
                             var tbody = $('#sales-statistics table tbody');
                             tbody.empty();
+
+                            // Filter statistics if date filter is applied
+                            if (dateFilter) {
+                                statistics = statistics.filter(stat =>
+                                    new Date(stat.reportDate).toISOString().split('T')[0] === dateFilter);
+                            }
+
+                            // Cache statistics for chart filtering
+                            window.cachedStatistics = statistics;
+
+                            // Check if canvas elements exist
+                            console.log("Revenue chart canvas exists:", !!document.getElementById('revenueChart'));
+                            console.log("Category chart canvas exists:", !!document.getElementById('categoryChart'));
+
                             if (statistics && statistics.length > 0) {
                                 statistics.forEach(function(stat) {
                                     var row = `
-                            <tr>
-                                <td>${stat.statisticId}</td>
-                                <td>${new Date(stat.reportDate).toISOString().split('T')[0]}</td>
-                                <td>${stat.productId || ''}</td>
-                                <td>${stat.categoryId || ''}</td>
-                                <td>${stat.totalQuantitySold}</td>
-                                <td>${parseFloat(stat.totalRevenue).toLocaleString('vi-VN')}</td>
-                                <td>${stat.timeDimension}</td>
-                                <td>${stat.topBuyer || 'N/A'}</td>
-                                <td>
-                                    <button class="btn btn-warning mr-2 edit-statistic" data-id="${stat.statisticId}">Edit</button>
-                                    <button class="btn btn-danger delete-statistic" data-id="${stat.statisticId}">Delete</button>
-                                </td>
-                            </tr>`;
+                    <tr>
+                        <td>${stat.statisticId}</td>
+                        <td>${new Date(stat.reportDate).toISOString().split('T')[0]}</td>
+                        <td>${stat.productId ? `#${stat.productId}` : 'All Products'}</td>
+                        <td>${stat.categoryId ? `#${stat.categoryId}` : 'All Categories'}</td>
+                        <td>${stat.totalQuantitySold}</td>
+                        <td>${parseFloat(stat.totalRevenue).toLocaleString('vi-VN')} VND</td>
+                        <td>${stat.timeDimension}</td>
+                        <td>${stat.topBuyer || 'N/A'}</td>
+                    </tr>`;
                                     tbody.append(row);
                                 });
+
+                                // Generate charts with the data
+                                setTimeout(function() {
+                                    try {
+                                        generateRevenueChart(statistics);
+                                        generateCategoryChart(statistics);
+                                    } catch (e) {
+                                        console.error("Error generating charts:", e);
+                                    }
+                                }, 100);
+
                             } else {
-                                tbody.append('<tr><td colspan="9">No sales statistics found</td></tr>');
+                                tbody.append('<tr><td colspan="8" class="text-center">No sales statistics found</td></tr>');
                             }
+
+                            // Load top buyers
+                            loadTopBuyers();
                         },
                         error: function(xhr) {
                             console.error('Error loading sales statistics:', xhr);
-                            $('#sales-statistics table tbody').html('<tr><td colspan="9">Error loading sales statistics</td></tr>');
+                            $('#sales-statistics table tbody').html('<tr><td colspan="8" class="text-center">Error loading sales statistics</td></tr>');
                         }
                     });
                 }
+                // Generate Today's Report
+                $('#generateReportBtn').on('click', function() {
+                    $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Generating...');
+
+                    $.ajax({
+                        url: '/api/SalesStatistics/GenerateReport',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            reportDate: new Date().toISOString().split('T')[0],
+                            timeDimension: 'Daily'
+                        }),
+                        success: function(response) {
+                            alert('Report generated successfully!');
+                            loadSalesStatistics(); // Reload statistics to show the new report
+                            $('#generateReportBtn').prop('disabled', false).html('<i class="fas fa-file-alt"></i> Generate Today\'s Report');
+                        },
+                        error: function(xhr) {
+                            console.error('Error generating report:', xhr);
+                            alert('Error generating report: ' + (xhr.responseText || 'Unknown error'));
+                            $('#generateReportBtn').prop('disabled', false).html('<i class="fas fa-file-alt"></i> Generate Today\'s Report');
+                        }
+                    });
+                });
 
                 // Initial load
                 loadSalesStatistics();
@@ -1656,6 +1726,319 @@
                         }
                     });
                 }
+                // Load Sales Statistics
+                function loadSalesStatistics(dateFilter = null) {
+                    $.ajax({
+                        url: '/api/SalesStatistics',
+                        method: 'GET',
+                        success: function(statistics) {
+                            var tbody = $('#sales-statistics table tbody');
+                            tbody.empty();
+
+                            // Filter statistics if date filter is applied
+                            if (dateFilter) {
+                                statistics = statistics.filter(stat =>
+                                    new Date(stat.reportDate).toISOString().split('T')[0] === dateFilter);
+                            }
+
+                            if (statistics && statistics.length > 0) {
+                                statistics.forEach(function(stat, index) {
+                                    var row = `
+                    <tr>
+                        <td>${stat.statisticId}</td>
+                        <td>${new Date(stat.reportDate).toISOString().split('T')[0]}</td>
+                        <td>${stat.productId ? `#${stat.productId}` : 'All Products'}</td>
+                        <td>${stat.categoryId ? `#${stat.categoryId}` : 'All Categories'}</td>
+                        <td>${stat.totalQuantitySold}</td>
+                        <td>${parseFloat(stat.totalRevenue).toLocaleString('vi-VN')} VND</td>
+                        <td>${stat.timeDimension}</td>
+                        <td>${stat.topBuyer || 'N/A'}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm edit-statistic" data-id="${stat.statisticId}">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-danger btn-sm delete-statistic" data-id="${stat.statisticId}">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </td>
+                    </tr>`;
+                                    tbody.append(row);
+                                });
+
+                                // Generate charts with the data
+                                generateRevenueChart(statistics);
+                                generateCategoryChart(statistics);
+
+                            } else {
+                                tbody.append('<tr><td colspan="9" class="text-center">No sales statistics found</td></tr>');
+                            }
+
+                            // Load top buyers
+                            loadTopBuyers();
+                        },
+                        error: function(xhr) {
+                            console.error('Error loading sales statistics:', xhr);
+                            $('#sales-statistics table tbody').html('<tr><td colspan="9" class="text-center">Error loading sales statistics</td></tr>');
+                        }
+                    });
+                }
+
+// Generate Revenue Chart
+                function generateRevenueChart(statistics) {
+                    // Group data by month for default view
+                    var monthlyData = groupDataByTimePeriod(statistics, 'month');
+
+                    // Create or update chart
+                    if (window.revenueChart) {
+                        window.revenueChart.destroy();
+                    }
+
+                    var ctx = document.getElementById('revenueChart').getContext('2d');
+                    window.revenueChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: monthlyData.labels,
+                            datasets: [{
+                                label: 'Revenue (VND)',
+                                data: monthlyData.values,
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 2,
+                                tension: 0.1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return value.toLocaleString('vi-VN') + ' VND';
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return context.dataset.label + ': ' +
+                                                context.parsed.y.toLocaleString('vi-VN') + ' VND';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+// Generate Category Chart
+                function generateCategoryChart(statistics) {
+                    // Group data by category
+                    var categoryData = {
+                        labels: [],
+                        values: []
+                    };
+
+                    // Create a map to store category totals
+                    var categoryMap = new Map();
+
+                    statistics.forEach(stat => {
+                        var categoryId = stat.categoryId || 'Uncategorized';
+                        var categoryName = categoryId === 'Uncategorized' ? 'Uncategorized' : `Category #${categoryId}`;
+
+                        if (categoryMap.has(categoryName)) {
+                            categoryMap.set(categoryName, categoryMap.get(categoryName) + stat.totalRevenue);
+                        } else {
+                            categoryMap.set(categoryName, stat.totalRevenue);
+                        }
+                    });
+
+                    // Convert map to arrays for chart
+                    categoryMap.forEach((value, key) => {
+                        categoryData.labels.push(key);
+                        categoryData.values.push(value);
+                    });
+
+                    // Create or update chart
+                    if (window.categoryChart) {
+                        window.categoryChart.destroy();
+                    }
+
+                    var ctx = document.getElementById('categoryChart').getContext('2d');
+                    window.categoryChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: categoryData.labels,
+                            datasets: [{
+                                data: categoryData.values,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.7)',
+                                    'rgba(54, 162, 235, 0.7)',
+                                    'rgba(255, 206, 86, 0.7)',
+                                    'rgba(75, 192, 192, 0.7)',
+                                    'rgba(153, 102, 255, 0.7)',
+                                    'rgba(255, 159, 64, 0.7)',
+                                    'rgba(199, 199, 199, 0.7)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            var label = context.label || '';
+                                            var value = context.parsed || 0;
+                                            return label + ': ' + value.toLocaleString('vi-VN') + ' VND';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+// Helper function to group data by time period
+                function groupDataByTimePeriod(statistics, period) {
+                    var result = {
+                        labels: [],
+                        values: []
+                    };
+
+                    var periodMap = new Map();
+
+                    statistics.forEach(stat => {
+                        var date = new Date(stat.reportDate);
+                        var periodKey;
+
+                        switch(period) {
+                            case 'day':
+                                periodKey = date.toISOString().split('T')[0];
+                                break;
+                            case 'month':
+                                periodKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+                                break;
+                            case 'year':
+                                periodKey = date.getFullYear().toString();
+                                break;
+                            default:
+                                periodKey = date.toISOString().split('T')[0];
+                        }
+
+                        if (periodMap.has(periodKey)) {
+                            periodMap.set(periodKey, periodMap.get(periodKey) + stat.totalRevenue);
+                        } else {
+                            periodMap.set(periodKey, stat.totalRevenue);
+                        }
+                    });
+
+                    // Sort periods chronologically
+                    var sortedPeriods = Array.from(periodMap.keys()).sort();
+
+                    sortedPeriods.forEach(period => {
+                        result.labels.push(formatPeriodLabel(period, period));
+                        result.values.push(periodMap.get(period));
+                    });
+
+                    return result;
+                }
+
+// Format period labels for better display
+                function formatPeriodLabel(period, type) {
+                    if (type === 'month') {
+                        const [year, month] = period.split('-');
+                        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                        return `${monthNames[parseInt(month) - 1]} ${year}`;
+                    } else if (type === 'day') {
+                        const date = new Date(period);
+                        return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+                    }
+                    return period;
+                }
+
+// Load Top Buyers
+                function loadTopBuyers() {
+                    $.ajax({
+                        url: '/api/SalesStatistics/TopBuyers',
+                        method: 'GET',
+                        success: function(buyers) {
+                            var tbody = $('#topBuyersTable tbody');
+                            tbody.empty();
+
+                            if (buyers && buyers.length > 0) {
+                                buyers.forEach(function(buyer, index) {
+                                    var row = `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${buyer.userName} (ID: ${buyer.userId})</td>
+                        <td>${buyer.totalPurchases}</td>
+                        <td>${parseFloat(buyer.totalSpent).toLocaleString('vi-VN')} VND</td>
+                        <td>${new Date(buyer.lastPurchaseDate).toLocaleDateString()}</td>
+                    </tr>`;
+                                    tbody.append(row);
+                                });
+                            } else {
+                                tbody.append('<tr><td colspan="5" class="text-center">No buyer data available</td></tr>');
+                            }
+                        },
+                        error: function(xhr) {
+                            console.error('Error loading top buyers:', xhr);
+                            $('#topBuyersTable tbody').html('<tr><td colspan="5" class="text-center">Error loading top buyers</td></tr>');
+                        }
+                    });
+                }
+
+// Event handlers for time period buttons
+                $('#revenueDailyBtn').on('click', function() {
+                    $(this).addClass('active').siblings().removeClass('active');
+                    var statistics = window.cachedStatistics || [];
+                    var dailyData = groupDataByTimePeriod(statistics, 'day');
+                    updateRevenueChart(dailyData);
+                });
+
+                $('#revenueMonthlyBtn').on('click', function() {
+                    $(this).addClass('active').siblings().removeClass('active');
+                    var statistics = window.cachedStatistics || [];
+                    var monthlyData = groupDataByTimePeriod(statistics, 'month');
+                    updateRevenueChart(monthlyData);
+                });
+
+                $('#revenueYearlyBtn').on('click', function() {
+                    $(this).addClass('active').siblings().removeClass('active');
+                    var statistics = window.cachedStatistics || [];
+                    var yearlyData = groupDataByTimePeriod(statistics, 'year');
+                    updateRevenueChart(yearlyData);
+                });
+
+// Update revenue chart with new data
+                function updateRevenueChart(data) {
+                    if (window.revenueChart) {
+                        window.revenueChart.data.labels = data.labels;
+                        window.revenueChart.data.datasets[0].data = data.values;
+                        window.revenueChart.update();
+                    }
+                }
+
+// Date filter for statistics
+                $('#statsDateFilter').on('change', function() {
+                    var dateFilter = $(this).val();
+                    loadSalesStatistics(dateFilter);
+                });
+
+// Clear date filter
+                $('#clearStatsFilter').on('click', function() {
+                    $('#statsDateFilter').val('');
+                    loadSalesStatistics();
+                });
+
+// Initial load
+                loadSalesStatistics();
             });
         });
     </script>
