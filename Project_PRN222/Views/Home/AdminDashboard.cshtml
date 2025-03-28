@@ -307,14 +307,22 @@
         <div class="container-fluid">
             <!-- Sidebar -->
             <div class="sidebar">
-                <h4>Admin Dashboard</h4>
-                <a class="nav-link active" data-tab="users"><i class="fas fa-users"></i> User Management</a>
-                <a class="nav-link" data-tab="products"><i class="fas fa-box"></i> Product Management</a>
-                <a class="nav-link" data-tab="sales-statistics"><i class="fas fa-chart-line"></i> Sales Statistics</a>
-                <form asp-action="Logout" asp-controller="Auth" method="post" style="margin: 0;">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="nav-link" style="border: none; background: none; width: 100%; text-align: left; margin-left: 20px"><i class="fas fa-sign-out-alt"></i> Logout</button>
-                </form>
+                <h4 class="p-3">Admin Dashboard</h4>
+                <a href="#users" class="nav-link" data-tab="users">
+                    <i class="fas fa-users"></i> User Management
+                </a>
+                <a href="#products" class="nav-link" data-tab="products">
+                    <i class="fas fa-box"></i> Product Management
+                </a>
+                <a href="#sales-statistics" class="nav-link" data-tab="sales-statistics">
+                    <i class="fas fa-chart-line"></i> Sales Statistics
+                </a>
+                <a href="#orders" class="nav-link" data-tab="orders">
+                    <i class="fas fa-shopping-cart"></i> Orders
+                </a>
+                <a href="/Home/Index" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
             </div>
 
             <!-- Main Content -->
@@ -437,6 +445,41 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Orders Tab Content -->
+                    <div class="tab-pane fade" id="orders">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h3>Orders</h3>
+                                <button id="refreshOrders" class="btn btn-primary">
+                                    <i class="fas fa-sync-alt"></i> Refresh
+                                </button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                        <tr>
+                                            <th>Order ID</th>
+                                            <th>Customer</th>
+                                            <th>Order Date</th>
+                                            <th>Total Amount</th>
+                                            <th>Status</th>
+                                            <th>Payment Method</th>
+                                            <th>Shipping Address</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <!-- Order data will be loaded here dynamically -->
+                                        <tr>
+                                            <td colspan="8" class="text-center">Loading orders...</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -547,6 +590,7 @@
             </div>
         </div>
     </div>
+    
 
     <!-- Add Product Modal -->
     <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
@@ -886,6 +930,7 @@
     <!-- Custom JavaScript -->
     <script>
         $(document).ready(function () {
+            
             // Chuyển đổi tab
             $('.nav-link').on('click', function () {
                 var target = $(this).data('tab');
@@ -1164,6 +1209,28 @@
             });
             // Sales Statistics CRUD Operations
             $(document).ready(function() {
+                $('.sidebar a.nav-link[data-tab]').on('click', function(e) {
+                    e.preventDefault();
+
+                    // Get the target tab
+                    var target = $(this).data('tab');
+
+                    if (!target) return;
+
+                    // Hide all tabs and remove active class from nav links
+                    $('.tab-pane').removeClass('show active');
+                    $('.sidebar a.nav-link').removeClass('active');
+
+                    // Show the selected tab and add active class to the clicked link
+                    $('#' + target).addClass('show active');
+                    $(this).addClass('active');
+
+                    // If orders tab is selected, load orders
+                    if (target === 'orders') {
+                        loadOrders();
+                    }
+                });
+                $('.sidebar a.nav-link[data-tab]:first').click();
                 // Load Sales Statistics
                 function loadSalesStatistics() {
                     $.ajax({
@@ -1314,6 +1381,281 @@
                         });
                     }
                 });
+                // Load orders
+                // Find the loadOrders function and update it like this:
+                function loadOrders() {
+                    $.ajax({
+                        url: '/api/Order/GetOrders',  // Update the URL to match your API endpoint
+                        method: 'GET',
+                        success: function(orders) {
+                            var tbody = $('#orders table tbody');  // Update selector to target the orders tab table
+                            tbody.empty();
+
+                            if (orders && orders.length > 0) {
+                                orders.forEach(function(order) {
+                                    var statusClass = getStatusBadgeClass(order.orderStatus);
+                                    var row = `
+                    <tr>
+                        <td>${order.orderId || ''}</td>
+                        <td>${order.user ? order.user.userName : 'Guest'}</td>
+                        <td>${order.orderDate ? new Date(order.orderDate).toLocaleString() : ''}</td>
+                        <td>${parseFloat(order.totalAmount).toLocaleString('vi-VN')} VND</td>
+                        <td><span class="badge ${statusClass}">${order.orderStatus || ''}</span></td>
+                        <td>${order.paymentMethod || ''}</td>
+                        <td>${order.shippingAddress || ''}</td>
+                        <td>
+                            <button class="btn btn-info view-order" data-id="${order.orderId}">View</button>
+                            ${order.orderStatus === 'Pending' ?
+                                        `<button class="btn btn-success confirm-order" data-id="${order.orderId}">Confirm</button>` : ''}
+                            ${order.orderStatus === 'Confirmed' ?
+                                        `<button class="btn btn-primary ship-order" data-id="${order.orderId}">Ship</button>` : ''}
+                            ${(order.orderStatus === 'Pending' || order.orderStatus === 'Confirmed') ?
+                                        `<button class="btn btn-danger cancel-order" data-id="${order.orderId}">Cancel</button>` : ''}
+                        </td>
+                    </tr>`;
+                                    tbody.append(row);
+                                });
+                            } else {
+                                tbody.append('<tr><td colspan="8" class="text-center">No orders found</td></tr>');
+                            }
+                        },
+                        error: function(xhr) {
+                            console.error('Error loading orders:', xhr.status, xhr.statusText, xhr.responseText);
+                            var errorMessage = xhr.status === 404
+                                ? 'Error 404: Orders API not found on this server.'
+                                : `Error ${xhr.status}: ${xhr.statusText} - ${xhr.responseText}`;
+                            $('#orders table tbody').html(`<tr><td colspan="8" class="text-center">${errorMessage}</td></tr>`);
+                        }
+                    });
+                }
+
+// Helper function to get badge class based on order status
+                function getStatusBadgeClass(status) {
+                    switch(status) {
+                        case 'Pending': return 'bg-warning text-dark';
+                        case 'Confirmed': return 'bg-info text-white';
+                        case 'Shipped': return 'bg-primary text-white';
+                        case 'Delivered': return 'bg-success text-white';
+                        case 'Cancelled': return 'bg-danger text-white';
+                        default: return 'bg-secondary text-white';
+                    }
+                }
+
+// Load orders when the page loads
+                loadOrders();
+
+// Refresh orders button
+                $('#refreshOrders').on('click', function() {
+                    loadOrders();
+                });
+
+// View order details
+                $('#orders').on('click', '.view-order', function() {
+                    var orderId = $(this).data('id');
+
+                    $.ajax({
+                        url: `/api/Order/${orderId}/details`,  // Update the URL to match your API endpoint
+                        method: 'GET',
+                        success: function(orderDetails) {
+                            showOrderDetailsModal(orderDetails);
+                        },
+                        error: function(xhr) {
+                            alert('Error loading order details: ' + (xhr.responseJSON?.message || xhr.statusText));
+                        }
+                    });
+                });
+                $('.nav-link[data-bs-target="#orders"]').on('click', function() {
+                    loadOrders();
+                });
+
+// Confirm order
+                $('#orders').on('click', '.confirm-order', function() {
+                    var orderId = $(this).data('id');
+
+                    if (confirm('Are you sure you want to confirm this order?')) {
+                        $.ajax({
+                            url: `/${orderId}/confirm`,  // Match the controller endpoint
+                            method: 'PUT',
+                            success: function() {
+                                alert('Order confirmed successfully!');
+                                loadOrders();
+                            },
+                            error: function(xhr) {
+                                alert('Error confirming order: ' + (xhr.responseJSON?.message || xhr.statusText));
+                            }
+                        });
+                    }
+                });
+
+// Ship order
+                $('#orders').on('click', '.ship-order', function() {
+                    var orderId = $(this).data('id');
+
+                    if (confirm('Are you sure you want to mark this order as shipped?')) {
+                        $.ajax({
+                            url: `/${orderId}/ship`,  // Match the controller endpoint
+                            method: 'PUT',
+                            success: function() {
+                                alert('Order marked as shipped successfully!');
+                                loadOrders();
+                            },
+                            error: function(xhr) {
+                                alert('Error updating order: ' + (xhr.responseJSON?.message || xhr.statusText));
+                            }
+                        });
+                    }
+                });
+
+// Cancel order
+                $('#orders').on('click', '.cancel-order', function() {
+                    var orderId = $(this).data('id');
+
+                    if (confirm('Are you sure you want to cancel this order?')) {
+                        $.ajax({
+                            url: `/${orderId}/cancel`,  // Match the controller endpoint
+                            method: 'PUT',
+                            success: function() {
+                                alert('Order cancelled successfully!');
+                                loadOrders();
+                            },
+                            error: function(xhr) {
+                                alert('Error cancelling order: ' + (xhr.responseJSON?.message || xhr.statusText));
+                            }
+                        });
+                    }
+                });
+
+
+                function showOrderDetailsModal(orderDetails) {
+                    var modalHtml = `
+    <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderDetailsModalLabel">Order #${orderDetails.orderId} Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Customer Information</h6>
+                            <p><strong>Name:</strong> ${orderDetails.user ? orderDetails.user.userName : 'Guest'}</p>
+                            <p><strong>Email:</strong> ${orderDetails.user ? orderDetails.user.email : 'N/A'}</p>
+                            <p><strong>Phone:</strong> ${orderDetails.user ? orderDetails.user.phoneNumber : 'N/A'}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Order Information</h6>
+                            <p><strong>Order Date:</strong> ${new Date(orderDetails.orderDate).toLocaleString()}</p>
+                            <p><strong>Status:</strong> <span class="badge ${getStatusBadgeClass(orderDetails.orderStatus)}">${orderDetails.orderStatus}</span></p>
+                            <p><strong>Payment Method:</strong> ${orderDetails.paymentMethod || 'N/A'}</p>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Shipping Address</h6>
+                            <p>${orderDetails.shippingAddress || 'N/A'}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Billing Address</h6>
+                            <p>${orderDetails.billingAddress || 'Same as shipping address'}</p>
+                        </div>
+                    </div>
+                    <h6>Order Items</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${orderDetails.orderItems.map(item => `
+                                <tr>
+                                    <td>${item.product ? item.product.productName : `Product #${item.productId}`}</td>
+                                    <td>${parseFloat(item.price).toLocaleString('vi-VN')} VND</td>
+                                    <td>${item.quantity}</td>
+                                    <td>${parseFloat(item.price * item.quantity).toLocaleString('vi-VN')} VND</td>
+                                </tr>
+                                `).join('')}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                                    <td>${parseFloat(orderDetails.totalAmount).toLocaleString('vi-VN')} VND</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Shipping:</strong></td>
+                                    <td>30,000 VND</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                    <td>${parseFloat(orderDetails.totalAmount + 30000).toLocaleString('vi-VN')} VND</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    ${orderDetails.orderStatus === 'Pending' ?
+                        `<button type="button" class="btn btn-success confirm-order-modal" data-id="${orderDetails.orderId}">Confirm Order</button>` : ''}
+                    ${orderDetails.orderStatus === 'Confirmed' ?
+                        `<button type="button" class="btn btn-primary ship-order-modal" data-id="${orderDetails.orderId}">Mark as Shipped</button>` : ''}
+                </div>
+            </div>
+        </div>
+    </div>`;
+
+                    // Remove existing modal if any
+                    $('#orderDetailsModal').remove();
+
+                    // Append modal to body
+                    $('body').append(modalHtml);
+
+                    // Show modal
+                    var modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+                    modal.show();
+
+                    // Add event handlers for modal buttons
+                    $('#orders').on('click', '.confirm-order', function() {
+                        var orderId = $(this).data('id');
+
+                        if (confirm('Are you sure you want to confirm this order?')) {
+                            $.ajax({
+                                url: `/api/Order/${orderId}/confirm`,  // Fixed URL with proper prefix
+                                method: 'PUT',
+                                success: function() {
+                                    alert('Order confirmed successfully!');
+                                    loadOrders();
+                                },
+                                error: function(xhr) {
+                                    alert('Error confirming order: ' + (xhr.responseJSON?.message || xhr.statusText));
+                                }
+                            });
+                        }
+                    });
+
+                    $('#orders').on('click', '.ship-order', function() {
+                        var orderId = $(this).data('id');
+
+                        if (confirm('Are you sure you want to mark this order as shipped?')) {
+                            $.ajax({
+                                url: `/api/Order/${orderId}/ship`,  // Fixed URL with proper prefix
+                                method: 'PUT',
+                                success: function() {
+                                    alert('Order marked as shipped successfully!');
+                                    loadOrders();
+                                },
+                                error: function(xhr) {
+                                    alert('Error updating order: ' + (xhr.responseJSON?.message || xhr.statusText));
+                                }
+                            });
+                        }
+                    });
+                }
             });
         });
     </script>

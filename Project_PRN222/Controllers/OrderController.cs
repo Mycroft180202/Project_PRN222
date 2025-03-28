@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Project_PRN222.Attributes;
 using Project_PRN222.DTO;
+using Project_PRN222.Models;
 using Project_PRN222.Services.Interfaces;
 
 namespace Project_PRN222.Controllers
@@ -35,6 +36,180 @@ namespace Project_PRN222.Controllers
                 }
 
                 return View(cartItems.ToList());
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction("Index", "Home");
+            }
+        }
+        [HttpGet]
+        [Route("api/Order/GetOrders")]
+        public async Task<IActionResult> GetOrders()
+        {
+            try
+            {
+                var orders = await _orderService.GetOrdersWithDetails();
+                var orderDtos = orders.Select(MapToOrderDto).ToList();
+                return Ok(orderDtos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Error retrieving orders: {ex.Message}" });
+            }
+        }
+        private OrderDto MapToOrderDto(Order order)
+        {
+            return new OrderDto
+            {
+                OrderId = order.OrderId,
+                OrderDate = order.OrderDate ?? DateTime.Now,
+                OrderStatus = order.OrderStatus,
+                TotalAmount = order.TotalAmount,
+                PaymentMethod = order.PaymentMethod,
+                ShippingAddress = order.ShippingAddress,
+                BillingAddress = order.BillingAddress,
+                User = order.User != null ? new User { 
+                    UserId = order.User.UserId,
+                    UserName = order.User.UserName,
+                    Email = order.User.Email,
+                    PhoneNumber = order.User.PhoneNumber
+                } : null,
+                OrderItems = order.OrderItems?.Select(item => new OrderItemDto
+                {
+                    OrderItemId = item.OrderItemId,
+                    ProductId = item.ProductId ?? 0,
+                    ProductName = item.Product?.ProductName ?? $"Product #{item.ProductId}",
+                    Price = item.Price,
+                    Quantity = item.Quantity
+                }).ToList()
+            };
+        }
+
+        [HttpGet("{id}/details")]
+        public async Task<IActionResult> GetOrderDetails(int id)
+        {
+            try
+            {
+                var order = await _orderService.GetOrderById(id);
+                if (order == null)
+                {
+                    return NotFound(new { message = $"Order with ID {id} not found" });
+                }
+        
+                // Create a DTO to avoid circular references
+                var orderDto = new OrderDto
+                {
+                    OrderId = order.OrderId,
+                    OrderDate = order.OrderDate ?? DateTime.MinValue,
+                    OrderStatus = order.OrderStatus,
+                    TotalAmount = order.TotalAmount,
+                    PaymentMethod = order.PaymentMethod,
+                    ShippingAddress = order.ShippingAddress,
+                    BillingAddress = order.BillingAddress,
+                    User = order.User, // This is safe as long as User doesn't reference back to Orders
+                    OrderItems = order.OrderItems.Select(oi => new OrderItemDto
+                    {
+                        OrderItemId = oi.OrderItemId,
+                        ProductId = oi.ProductId ?? 0,
+                        ProductName = oi.ProductName, // This is safe as long as Product doesn't reference back to OrderItems
+                        Quantity = oi.Quantity,
+                        Price = oi.Price
+                    }).ToList()
+                };
+        
+                return Ok(orderDto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Error retrieving order details: {ex.Message}" });
+            }
+        }
+        [HttpPut("{id}/confirm")]
+        public async Task<IActionResult> ConfirmOrder(int id)
+        {
+            try
+            {
+                var success = await _orderService.UpdateOrderStatus(id, "Confirmed");
+                if (!success)
+                {
+                    return NotFound(new { message = $"Order with ID {id} not found or cannot be confirmed" });
+                }
+                return Ok(new { message = "Order confirmed successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Error confirming order: {ex.Message}" });
+            }
+        }
+        [HttpPut("{id}/ship")]
+        public async Task<IActionResult> ShipOrder(int id)
+        {
+            try
+            {
+                var success = await _orderService.UpdateOrderStatus(id, "Shipped");
+                if (!success)
+                {
+                    return NotFound(new { message = $"Order with ID {id} not found or cannot be shipped" });
+                }
+                return Ok(new { message = "Order marked as shipped successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Error shipping order: {ex.Message}" });
+            }
+        }
+        [HttpPut("{id}/cancel")]
+        public async Task<IActionResult> CancelOrder(int id)
+        {
+            try
+            {
+                var success = await _orderService.UpdateOrderStatus(id, "Cancelled");
+                if (!success)
+                {
+                    return NotFound(new { message = $"Order with ID {id} not found or cannot be cancelled" });
+                }
+                return Ok(new { message = "Order cancelled successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Error cancelling order: {ex.Message}" });
+            }
+        }
+        [HttpPut("{id}/deliver")]
+        public async Task<IActionResult> DeliverOrder(int id)
+        {
+            try
+            {
+                var success = await _orderService.UpdateOrderStatus(id, "Delivered");
+                if (!success)
+                {
+                    return NotFound(new { message = $"Order with ID {id} not found or cannot be marked as delivered" });
+                }
+                return Ok(new { message = "Order marked as delivered successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Error updating order: {ex.Message}" });
+            }
+        }
+        [HttpGet]
+        [Route("Order/MyOrders")]
+        [RoleAuthorize(1, 2, 3)] // Allow all authenticated users
+        public async Task<IActionResult> MyOrders()
+        {
+            try
+            {
+                // Get current user ID from session
+                var userIdString = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
+                {
+                    return RedirectToAction("Login", "Auth");
+                }
+
+                // Get all orders for the current user
+                var orders = await _orderService.GetOrdersByUserId(userId);
+                return View(orders);
             }
             catch (Exception ex)
             {

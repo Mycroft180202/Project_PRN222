@@ -204,5 +204,78 @@ namespace Project_PRN222.Services.Implementations
         {
             return await _orderRepository.GetAllWithDetails();
         }
+        public async Task<bool> UpdateOrderStatus(int orderId, string newStatus)
+{
+    try
+    {
+        var order = await _orderRepository.GetById(orderId);
+        if (order == null)
+        {
+            return false;
+        }
+
+        // Validate status transitions
+        if (!IsValidStatusTransition(order.OrderStatus, newStatus))
+        {
+            return false;
+        }
+
+        order.OrderStatus = newStatus;
+        order.UpdatedDate = DateTime.Now;
+        
+        // Update delivery status if needed
+        if (newStatus == "Shipped" || newStatus == "Delivered")
+        {
+            var delivery = await _deliveryRepository.GetByOrderId(orderId);
+            
+            if (delivery != null)
+            {
+                if (newStatus == "Shipped")
+                {
+                    delivery.DeliveryStatus = "In Transit";
+                    delivery.UpdatedDate = DateTime.Now;
+                }
+                else if (newStatus == "Delivered")
+                {
+                    delivery.DeliveryStatus = "Delivered";
+                    delivery.DeliveryDate = DateTime.Now;
+                    delivery.UpdatedDate = DateTime.Now;
+                }
+                
+                await _deliveryRepository.UpdateDelivery(delivery);
+            }
+        }
+
+        await _orderRepository.UpdateOrder(order);
+        return true;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error updating order status: {ex.Message}");
+        return false;
+    }
+}
+
+// Helper method to validate status transitions
+private bool IsValidStatusTransition(string currentStatus, string newStatus)
+{
+    switch (currentStatus)
+    {
+        case "Pending":
+            return newStatus == "Confirmed" || newStatus == "Cancelled";
+        case "Confirmed":
+            return newStatus == "Shipped" || newStatus == "Cancelled";
+        case "Shipped":
+            return newStatus == "Delivered";
+        default:
+            return false; // No transitions allowed from other statuses
+    }
+}
+public async Task<List<Order>> GetOrdersByUserId(int userId)
+{
+    // Get orders for a specific user with all related details
+    var orders = await _orderRepository.GetOrdersByUserId(userId);
+    return orders;
+}
     }
 }

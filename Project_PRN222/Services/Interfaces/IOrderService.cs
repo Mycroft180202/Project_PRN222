@@ -10,5 +10,7 @@ namespace Project_PRN222.Services.Interfaces
         Task<IActionResult> ProcessVnpayCallback(IQueryCollection query);
         Task<Order> GetOrderById(int orderId);
         Task<List<Order>> GetOrdersWithDetails();
+        Task<bool> UpdateOrderStatus(int orderId, string newStatus);
+        Task<List<Order>> GetOrdersByUserId(int userId);
     }
 }

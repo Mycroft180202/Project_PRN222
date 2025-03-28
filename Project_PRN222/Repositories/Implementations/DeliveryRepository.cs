@@ -1,4 +1,5 @@
-﻿using Project_PRN222.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Project_PRN222.Models;
 using Project_PRN222.Repositories.Interfaces;
 
 namespace Project_PRN222.Repositories.Implementations
@@ -15,6 +16,17 @@ namespace Project_PRN222.Repositories.Implementations
         public async Task AddDelivery(Delivery delivery)
         {
             await _context.Deliveries.AddAsync(delivery);
+            await _context.SaveChangesAsync();
+        }
+        public async Task<Delivery> GetByOrderId(int orderId)
+        {
+            return await _context.Deliveries
+                .FirstOrDefaultAsync(d => d.OrderId == orderId);
+        }
+
+        public async Task UpdateDelivery(Delivery delivery)
+        {
+            _context.Deliveries.Update(delivery);
             await _context.SaveChangesAsync();
         }
     }

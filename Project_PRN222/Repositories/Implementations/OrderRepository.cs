@@ -41,5 +41,14 @@ namespace Project_PRN222.Repositories.Implementations
                 .ThenInclude(p => p.Category)
                 .ToListAsync();
         }
+        public async Task<List<Order>> GetOrdersByUserId(int userId)
+        {
+            return await _context.Orders
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Product)
+                .Where(o => o.UserId == userId)
+                .OrderByDescending(o => o.OrderDate)
+                .ToListAsync();
+        }
     }
 }

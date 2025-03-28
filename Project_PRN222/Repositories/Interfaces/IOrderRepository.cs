@@ -8,5 +8,6 @@ namespace Project_PRN222.Repositories.Interfaces
         Task<Order> GetById(int orderId);
         Task UpdateOrder(Order order);
         Task<List<Order>> GetAllWithDetails();
+        Task<List<Order>> GetOrdersByUserId(int userId);
     }
 }
