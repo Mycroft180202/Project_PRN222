@@ -83,6 +83,9 @@ namespace Project_PRN222.Services.Implementations
             session.SetString("UserName", user.UserName);
             session.SetString("RoleId", user.RoleId.ToString());
             session.SetString("IsActive", user.IsActive.ToString());
+            session.SetString("Address", user.Address.ToString());
+            session.SetString("PhoneNumber", user.PhoneNumber.ToString());
+            session.SetString("Email", user.Email.ToString());
 
             // Thiết lập Cookie Authentication
             var claims = new List<Claim>

@@ -44,6 +44,7 @@ builder.Services.AddScoped<IVendorRepository, VendorRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
 builder.Services.AddScoped<IDeliveryRepository, DeliveryRepository>();
+builder.Services.AddScoped<ISalesStatisticsRepository, SalesStatisticsRepository>();
 
 // Register services
 builder.Services.AddScoped<IProductService, ProductService>();
@@ -55,6 +56,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IVendorService, VendorService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<VnpayPayment>();
+builder.Services.AddScoped<ISalesStatisticsService, SalesStatisticsService>();
 
 // Add HttpContextAccessor for session and IP address retrieval
 builder.Services.AddHttpContextAccessor();

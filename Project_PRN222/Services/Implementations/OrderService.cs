@@ -200,5 +200,9 @@ namespace Project_PRN222.Services.Implementations
         {
             return await _orderRepository.GetById(orderId);
         }
+        public async Task<List<Order>> GetOrdersWithDetails()
+        {
+            return await _orderRepository.GetAllWithDetails();
+        }
     }
 }

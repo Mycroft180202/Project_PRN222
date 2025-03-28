@@ -32,5 +32,14 @@ namespace Project_PRN222.Repositories.Implementations
             _context.Orders.Update(order);
             await _context.SaveChangesAsync();
         }
+        public async Task<List<Order>> GetAllWithDetails()
+        {
+            return await _context.Orders
+                .Include(o => o.User)
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Product)
+                .ThenInclude(p => p.Category)
+                .ToListAsync();
+        }
     }
 }

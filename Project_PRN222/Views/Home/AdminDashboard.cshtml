@@ -8,7 +8,7 @@
     // Dữ liệu tĩnh cho Sales Statistics (Backend Note: Replace với real data từ ISalesStatisticsService)
     var mockSalesStatistics = new List<dynamic>
     {
-        new { StatisticId = 1, ReportDate = DateTime.Parse("2023-01-01"), ProductId = 1, CategoryId = 1, TotalQuantitySold = 50, TotalRevenue = 2500.00M, TimeDimension = "Monthly" }
+        new { StatisticId = 1, ReportDate = DateTime.Parse("2023-01-01"), ProductId = 1, CategoryId = 1, TotalQuantitySold = 50, TotalRevenue = 2500.00M, TimeDimension = "Monthly", TopBuyer = "John Doe (ID: 5)" }
     };
 }
 
@@ -401,34 +401,36 @@
                                 <div class="table-responsive">
                                     <table class="table">
                                         <thead>
-                                            <tr>
-                                                <th>ID</th>
-                                                <th>Report Date</th>
-                                                <th>Product ID</th>
-                                                <th>Category ID</th>
-                                                <th>Total Quantity Sold</th>
-                                                <th>Total Revenue</th>
-                                                <th>Time Dimension</th>
-                                                <th>Actions</th>
-                                            </tr>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Report Date</th>
+                                            <th>Product ID</th>
+                                            <th>Category ID</th>
+                                            <th>Total Quantity Sold</th>
+                                            <th>Total Revenue</th>
+                                            <th>Time Dimension</th>
+                                            <th>Top Buyer</th>
+                                            <th>Actions</th>
+                                        </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach (var stat in mockSalesStatistics)
-                                            {
-                                                <tr>
-                                                    <td>@stat.StatisticId</td>
-                                                    <td>@stat.ReportDate.ToString("yyyy-MM-dd")</td>
-                                                    <td>@stat.ProductId</td>
-                                                    <td>@stat.CategoryId</td>
-                                                    <td>@stat.TotalQuantitySold</td>
-                                                    <td>@stat.TotalRevenue</td>
-                                                    <td>@stat.TimeDimension</td>
-                                                    <td>
-                                                        <button class="btn btn-warning mr-2" data-bs-toggle="modal" data-bs-target="#editSalesStatisticModal">Edit</button>
-                                                        <a class="btn btn-danger" href="#">Delete</a>
-                                                    </td>
-                                                </tr>
-                                            }
+                                        @foreach (var stat in mockSalesStatistics)
+                                        {
+                                            <tr>
+                                                <td>@stat.StatisticId</td>
+                                                <td>@stat.ReportDate.ToString("yyyy-MM-dd")</td>
+                                                <td>@stat.ProductId</td>
+                                                <td>@stat.CategoryId</td>
+                                                <td>@stat.TotalQuantitySold</td>
+                                                <td>@stat.TotalRevenue.ToString("N0")</td>
+                                                <td>@stat.TimeDimension</td>
+                                                <td>@stat.TopBuyer</td>
+                                                <td>
+                                                    <button class="btn btn-warning mr-2 edit-statistic" data-id="@stat.StatisticId">Edit</button>
+                                                    <button class="btn btn-danger delete-statistic" data-id="@stat.StatisticId">Delete</button>
+                                                </td>
+                                            </tr>
+                                        }
                                         </tbody>
                                     </table>
                                 </div>
@@ -677,46 +679,51 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="addSalesStatisticForm" asp-action="Create" asp-controller="SalesStatistics" method="post">
-                        @Html.AntiForgeryToken()
+                    <form id="addSalesStatisticForm">
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="addReportDate">Report Date</label>
                                     <input type="date" class="form-control" id="addReportDate" name="ReportDate" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="addProductId">Product ID</label>
-                                    <input type="number" class="form-control" id="addProductId" name="ProductId" required>
+                                    <input type="number" class="form-control" id="addProductId" name="ProductId" min="1">
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="addCategoryId">Category ID</label>
-                                    <input type="number" class="form-control" id="addCategoryId" name="CategoryId" required>
+                                    <input type="number" class="form-control" id="addCategoryId" name="CategoryId" min="1">
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="addTotalQuantitySold">Total Quantity Sold</label>
-                                    <input type="number" class="form-control" id="addTotalQuantitySold" name="TotalQuantitySold" required>
+                                    <input type="number" class="form-control" id="addTotalQuantitySold" name="TotalQuantitySold" min="0" required>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="addTotalRevenue">Total Revenue</label>
-                                    <input type="number" class="form-control" id="addTotalRevenue" name="TotalRevenue" step="0.01" required>
+                                    <input type="number" class="form-control" id="addTotalRevenue" name="TotalRevenue" min="0" step="0.01" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="addTimeDimension">Time Dimension</label>
                                     <select class="form-control" id="addTimeDimension" name="TimeDimension" required>
+                                        <option value="">Select Time Dimension</option>
                                         <option value="Daily">Daily</option>
                                         <option value="Weekly">Weekly</option>
                                         <option value="Monthly">Monthly</option>
+                                        <option value="Quarterly">Quarterly</option>
                                         <option value="Yearly">Yearly</option>
                                     </select>
                                 </div>
@@ -724,7 +731,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save Statistic</button>
+                            <button type="submit" class="btn btn-primary">Add Statistic</button>
                         </div>
                     </form>
                 </div>
@@ -741,47 +748,52 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editSalesStatisticForm" asp-action="Edit" asp-controller="SalesStatistics" method="post">
-                        @Html.AntiForgeryToken()
+                    <form id="editSalesStatisticForm">
                         <input type="hidden" id="editStatisticId" name="StatisticId">
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="editReportDate">Report Date</label>
                                     <input type="date" class="form-control" id="editReportDate" name="ReportDate" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="editProductId">Product ID</label>
-                                    <input type="number" class="form-control" id="editProductId" name="ProductId" required>
+                                    <input type="number" class="form-control" id="editProductId" name="ProductId" min="1">
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="editCategoryId">Category ID</label>
-                                    <input type="number" class="form-control" id="editCategoryId" name="CategoryId" required>
+                                    <input type="number" class="form-control" id="editCategoryId" name="CategoryId" min="1">
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="editTotalQuantitySold">Total Quantity Sold</label>
-                                    <input type="number" class="form-control" id="editTotalQuantitySold" name="TotalQuantitySold" required>
+                                    <input type="number" class="form-control" id="editTotalQuantitySold" name="TotalQuantitySold" min="0" required>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="editTotalRevenue">Total Revenue</label>
-                                    <input type="number" class="form-control" id="editTotalRevenue" name="TotalRevenue" step="0.01" required>
+                                    <input type="number" class="form-control" id="editTotalRevenue" name="TotalRevenue" min="0" step="0.01" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="editTimeDimension">Time Dimension</label>
                                     <select class="form-control" id="editTimeDimension" name="TimeDimension" required>
+                                        <option value="">Select Time Dimension</option>
                                         <option value="Daily">Daily</option>
                                         <option value="Weekly">Weekly</option>
                                         <option value="Monthly">Monthly</option>
+                                        <option value="Quarterly">Quarterly</option>
                                         <option value="Yearly">Yearly</option>
                                     </select>
                                 </div>
@@ -789,7 +801,77 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Update Statistic</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Sales Statistic Modal -->
+    <div class="modal fade" id="editSalesStatisticModal" tabindex="-1" aria-labelledby="editSalesStatisticModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editSalesStatisticModalLabel">Edit Sales Statistic</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editSalesStatisticForm">
+                        <input type="hidden" id="editStatisticId" name="StatisticId">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="editReportDate">Report Date</label>
+                                    <input type="date" class="form-control" id="editReportDate" name="ReportDate" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="editProductId">Product ID</label>
+                                    <input type="number" class="form-control" id="editProductId" name="ProductId" min="1">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="editCategoryId">Category ID</label>
+                                    <input type="number" class="form-control" id="editCategoryId" name="CategoryId" min="1">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="editTotalQuantitySold">Total Quantity Sold</label>
+                                    <input type="number" class="form-control" id="editTotalQuantitySold" name="TotalQuantitySold" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="editTotalRevenue">Total Revenue</label>
+                                    <input type="number" class="form-control" id="editTotalRevenue" name="TotalRevenue" min="0" step="0.01" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="editTimeDimension">Time Dimension</label>
+                                    <select class="form-control" id="editTimeDimension" name="TimeDimension" required>
+                                        <option value="">Select Time Dimension</option>
+                                        <option value="Daily">Daily</option>
+                                        <option value="Weekly">Weekly</option>
+                                        <option value="Monthly">Monthly</option>
+                                        <option value="Quarterly">Quarterly</option>
+                                        <option value="Yearly">Yearly</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
                         </div>
                     </form>
                 </div>
@@ -1079,6 +1161,159 @@
                         }
                     });
                 }
+            });
+            // Sales Statistics CRUD Operations
+            $(document).ready(function() {
+                // Load Sales Statistics
+                function loadSalesStatistics() {
+                    $.ajax({
+                        url: '/api/SalesStatistics',
+                        method: 'GET',
+                        success: function(statistics) {
+                            var tbody = $('#sales-statistics table tbody');
+                            tbody.empty();
+                            if (statistics && statistics.length > 0) {
+                                statistics.forEach(function(stat) {
+                                    var row = `
+                            <tr>
+                                <td>${stat.statisticId}</td>
+                                <td>${new Date(stat.reportDate).toISOString().split('T')[0]}</td>
+                                <td>${stat.productId || ''}</td>
+                                <td>${stat.categoryId || ''}</td>
+                                <td>${stat.totalQuantitySold}</td>
+                                <td>${parseFloat(stat.totalRevenue).toLocaleString('vi-VN')}</td>
+                                <td>${stat.timeDimension}</td>
+                                <td>${stat.topBuyer || 'N/A'}</td>
+                                <td>
+                                    <button class="btn btn-warning mr-2 edit-statistic" data-id="${stat.statisticId}">Edit</button>
+                                    <button class="btn btn-danger delete-statistic" data-id="${stat.statisticId}">Delete</button>
+                                </td>
+                            </tr>`;
+                                    tbody.append(row);
+                                });
+                            } else {
+                                tbody.append('<tr><td colspan="9">No sales statistics found</td></tr>');
+                            }
+                        },
+                        error: function(xhr) {
+                            console.error('Error loading sales statistics:', xhr);
+                            $('#sales-statistics table tbody').html('<tr><td colspan="9">Error loading sales statistics</td></tr>');
+                        }
+                    });
+                }
+
+                // Initial load
+                loadSalesStatistics();
+
+                // Add Sales Statistic
+                $('#addSalesStatisticForm').on('submit', function(e) {
+                    e.preventDefault();
+                    var formData = $(this).serializeArray();
+                    var statisticData = {};
+
+                    formData.forEach(function(item) {
+                        if (item.name === 'TotalQuantitySold') {
+                            statisticData[item.name] = parseInt(item.value);
+                        } else if (item.name === 'TotalRevenue') {
+                            statisticData[item.name] = parseFloat(item.value);
+                        } else if (item.name === 'ProductId' || item.name === 'CategoryId') {
+                            statisticData[item.name] = item.value ? parseInt(item.value) : null;
+                        } else {
+                            statisticData[item.name] = item.value;
+                        }
+                    });
+
+                    $.ajax({
+                        url: '/api/SalesStatistics',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(statisticData),
+                        success: function() {
+                            $('#addSalesStatisticModal').modal('hide');
+                            loadSalesStatistics();
+                            $('#addSalesStatisticForm')[0].reset();
+                        },
+                        error: function(xhr) {
+                            alert('Error adding sales statistic: ' + xhr.responseText);
+                        }
+                    });
+                });
+
+                // Edit Sales Statistic - Load Data
+                $('#sales-statistics').on('click', '.edit-statistic', function() {
+                    var statisticId = $(this).data('id');
+
+                    $.ajax({
+                        url: `/api/SalesStatistics/${statisticId}`,
+                        method: 'GET',
+                        success: function(statistic) {
+                            $('#editStatisticId').val(statistic.statisticId);
+                            $('#editReportDate').val(new Date(statistic.reportDate).toISOString().split('T')[0]);
+                            $('#editProductId').val(statistic.productId || '');
+                            $('#editCategoryId').val(statistic.categoryId || '');
+                            $('#editTotalQuantitySold').val(statistic.totalQuantitySold);
+                            $('#editTotalRevenue').val(statistic.totalRevenue);
+                            $('#editTimeDimension').val(statistic.timeDimension);
+
+                            $('#editSalesStatisticModal').modal('show');
+                        },
+                        error: function(xhr) {
+                            alert('Error loading sales statistic: ' + xhr.responseText);
+                        }
+                    });
+                });
+
+                // Edit Sales Statistic - Submit
+                $('#editSalesStatisticForm').on('submit', function(e) {
+                    e.preventDefault();
+                    var statisticId = $('#editStatisticId').val();
+                    var formData = $(this).serializeArray();
+                    var statisticData = {};
+
+                    formData.forEach(function(item) {
+                        if (item.name === 'StatisticId' || item.name === 'TotalQuantitySold') {
+                            statisticData[item.name] = parseInt(item.value);
+                        } else if (item.name === 'TotalRevenue') {
+                            statisticData[item.name] = parseFloat(item.value);
+                        } else if (item.name === 'ProductId' || item.name === 'CategoryId') {
+                            statisticData[item.name] = item.value ? parseInt(item.value) : null;
+                        } else {
+                            statisticData[item.name] = item.value;
+                        }
+                    });
+
+                    $.ajax({
+                        url: `/api/SalesStatistics/${statisticId}`,
+                        method: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify(statisticData),
+                        success: function() {
+                            $('#editSalesStatisticModal').modal('hide');
+                            loadSalesStatistics();
+                        },
+                        error: function(xhr) {
+                            alert('Error updating sales statistic: ' + xhr.responseText);
+                        }
+                    });
+                });
+
+                // Delete Sales Statistic
+                $('#sales-statistics').on('click', '.delete-statistic', function() {
+                    var statisticId = $(this).data('id');
+
+                    if (confirm('Are you sure you want to delete this sales statistic?')) {
+                        $.ajax({
+                            url: `/api/SalesStatistics/${statisticId}`,
+                            method: 'DELETE',
+                            success: function() {
+                                loadSalesStatistics();
+                            },
+                            error: function(xhr) {
+                                alert('Error deleting sales statistic: ' + xhr.responseText);
+                            }
+                        });
+                    }
+                });
             });
         });
     </script>

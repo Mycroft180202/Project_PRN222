@@ -9,5 +9,6 @@ namespace Project_PRN222.Services.Interfaces
         Task<string> Checkout(string shippingAddress, string billingAddress, int shipmentMethodId, string paymentMethod);
         Task<IActionResult> ProcessVnpayCallback(IQueryCollection query);
         Task<Order> GetOrderById(int orderId);
+        Task<List<Order>> GetOrdersWithDetails();
     }
 }

@@ -4,6 +4,20 @@
     ViewData["Title"] = "Checkout - EShopper";
     Layout = null;
 
+    // Get user information from session
+    var userId = Context.Session.GetString("UserId");
+    var userName = Context.Session.GetString("UserName");
+    var firstName = Context.Session.GetString("FirstName");
+    var lastName = Context.Session.GetString("LastName");
+    var email = Context.Session.GetString("Email");
+    var phoneNumber = Context.Session.GetString("PhoneNumber");
+    var address = Context.Session.GetString("Address");
+
+    // Combine first and last name for full name
+    var fullName = string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName)
+        ? userName
+        : $"{firstName} {lastName}";
+
     // Dữ liệu tĩnh để hiển thị giao diện khi backend gặp lỗi hoặc không trả về dữ liệu
     var mockCartItems = new List<Project_PRN222.DTO.CartItemDto>
     {
@@ -126,100 +140,78 @@
                     <h4 class="font-weight-semi-bold m-0">Billing Details</h4>
                 </div>
                 <div class="card-body">
-                    <form id="checkoutForm">
-                        <div class="row">
-                            <div class="col-md-12 form-group">
-                                <label class="text-gray-700">Full Name</label>
-                                <input class="form-control" type="text" id="fullName" placeholder="John Doe" required>
-                            </div>
-                            <div class="col-md-12 form-group">
-                                <label class="text-gray-700">E-mail</label>
-                                <input class="form-control" type="email" id="email" placeholder="example@email.com" required>
-                            </div>
-                            <div class="col-md-12 form-group">
-                                <label class="text-gray-700">Phone Number</label>
-                                <input class="form-control" type="text" id="phoneNumber" placeholder="+84 123 456 789" required>
-                            </div>
-                            <div class="col-md-12 form-group">
-                                <label class="text-gray-700">Address</label>
-                                <input class="form-control" type="text" id="shippingAddress" placeholder="123 Street, City, Country" required>
-                            </div>
+                    <div class="row">
+                        <div class="col-md-12 form-group">
+                            <label>Full Name</label>
+                            <input class="form-control" type="text" id="fullName" value="@fullName">
                         </div>
-                    </form>
+                        <div class="col-md-6 form-group">
+                            <label>E-mail</label>
+                            <input class="form-control" type="text" id="email" value="@email">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Mobile No</label>
+                            <input class="form-control" type="text" id="phoneNumber" value="@phoneNumber">
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <label>Address</label>
+                            <input class="form-control" type="text" id="shippingAddress" value="@address">
+                        </div>
+                    </div>
                 </div>
             </div>
 
+            <!-- Shipping Methods Section -->
             <div class="mb-4 shadow-sm rounded-lg overflow-hidden">
                 <div class="card-header bg-secondary border-0">
                     <h4 class="font-weight-semi-bold m-0">Shipping Method</h4>
                 </div>
                 <div class="card-body">
                     <div class="shipping-method selected">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <input type="radio" id="standardShipping" name="shipmentMethod" value="1" checked class="mr-2">
-                                <label for="standardShipping" class="mb-0 font-weight-medium">Standard Shipping</label>
-                                <p class="text-muted small mb-0 mt-1">Delivery within 3-5 business days</p>
-                            </div>
-                            <span class="font-weight-bold">30,000 VND</span>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="shippingMethod" id="standardShipping" value="1" checked>
+                            <label class="form-check-label" for="standardShipping">
+                                <strong>Standard Shipping</strong> - @shippingCost.ToString("N0") VND
+                            </label>
+                            <p class="text-muted small mt-1">Delivery in 3-5 business days</p>
                         </div>
                     </div>
-                    <input type="hidden" id="hiddenShipmentMethodId" value="1">
                 </div>
             </div>
 
+            <!-- Payment Methods Section -->
             <div class="mb-4 shadow-sm rounded-lg overflow-hidden">
                 <div class="card-header bg-secondary border-0">
                     <h4 class="font-weight-semi-bold m-0">Payment Method</h4>
                 </div>
                 <div class="card-body">
                     <div class="form-group">
-                        <div class="custom-control custom-radio mb-3">
-                            <input type="radio" class="custom-control-input" name="paymentMethod" id="cod" value="COD" checked>
-                            <label class="custom-control-label" for="cod">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-money-bill-wave text-primary mr-2"></i>
-                                    Cash on Delivery (COD)
-                                </div>
-                                <small class="text-muted d-block mt-1">Pay when you receive your order</small>
-                            </label>
-                        </div>
                         <div class="custom-control custom-radio">
-                            <input type="radio" class="custom-control-input" name="paymentMethod" id="vnpay" value="VNPAY">
-                            <label class="custom-control-label" for="vnpay">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-credit-card text-primary mr-2"></i>
-                                    Checkout with VNPAY
-                                </div>
-                                <small class="text-muted d-block mt-1">Pay securely online with VNPAY</small>
-                            </label>
+                            <input type="radio" class="custom-control-input" name="paymentMethod" id="paymentCOD" value="COD" checked>
+                            <label class="custom-control-label" for="paymentCOD">Cash On Delivery</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-control custom-radio">
+                            <input type="radio" class="custom-control-input" name="paymentMethod" id="paymentVNPAY" value="VNPAY">
+                            <label class="custom-control-label" for="paymentVNPAY">VNPAY</label>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
         <div class="col-lg-4">
             <div class="card border-secondary mb-5 shadow-sm rounded-lg overflow-hidden">
                 <div class="card-header bg-secondary border-0">
                     <h4 class="font-weight-semi-bold m-0">Order Summary</h4>
                 </div>
                 <div class="card-body">
-                    <h5 class="font-weight-medium mb-3">Products</h5>
-                    @foreach (var item in cartItems)
-                    {
-                        <div class="d-flex justify-content-between mb-2">
-                            <p class="mb-0">@item.ProductName</p>
-                            <p class="mb-0">@item.Quantity x @item.Price.ToString("N0") VND</p>
-                        </div>
-                    }
-                    <hr class="mt-0 mb-3">
                     <div class="d-flex justify-content-between mb-3 pt-1">
                         <h6 class="font-weight-medium">Subtotal</h6>
                         <h6 class="font-weight-medium">@subtotal.ToString("N0") VND</h6>
                     </div>
                     <div class="d-flex justify-content-between">
-                        <h6 class="font-weight-medium">Shipping Fee</h6>
+                        <h6 class="font-weight-medium">Shipping</h6>
                         <h6 class="font-weight-medium">@shippingCost.ToString("N0") VND</h6>
                     </div>
                 </div>
@@ -231,6 +223,36 @@
                     <button class="btn btn-block btn-primary my-3 py-3" id="placeOrderBtn">
                         <i class="fas fa-shopping-bag mr-2"></i>Place Order
                     </button>
+                </div>
+            </div>
+
+            <!-- Order Items Summary -->
+            <div class="card border-secondary mb-5 shadow-sm rounded-lg overflow-hidden">
+                <div class="card-header bg-secondary border-0">
+                    <h4 class="font-weight-semi-bold m-0">Order Items</h4>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-borderless table-sm m-0">
+                            <tbody>
+                            @foreach (var item in cartItems)
+                            {
+                                <tr>
+                                    <td class="pl-3 py-3">
+                                        <div class="d-flex align-items-center">
+                                          
+                                            <div class="ml-3">
+                                                <p class="mb-0">@item.ProductName</p>
+                                                <small class="text-muted">@item.Quantity x @item.Price.ToString("N0") VND</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-right pr-3 py-3">@((item.Quantity * item.Price).ToString("N0")) VND</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
